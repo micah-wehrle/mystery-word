@@ -1,0 +1,30 @@
+<div class="container mt-5">
+  <div class="row">
+    <div class="col" style="height:10vh; align-items: center; justify-content: center;">
+      <ng-container *ngFor="let letter of guessText">
+        <div
+          [ngStyle]="generateRandomStyle(letter.wordI, letter.letterI, letter.letter, true)"
+          class="fancy"
+          (click)="sendLetterBack(letter.wordI, letter.letterI, letter.letter)">
+            {{ letter.letter }}
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col">
+      <ng-container *ngFor="let word of wordArray; let wordI = index;">
+        <div style="margin-left:3vw; display:inline-block;">
+          <ng-container *ngFor="let str of word.split(''); let letterI = index;">
+            <div 
+            [ngStyle]="generateRandomStyle(wordI, letterI, str)"
+            class="fancy" 
+            (click)="onLetterClick(wordI, letterI, str)">
+                {{ str }}
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

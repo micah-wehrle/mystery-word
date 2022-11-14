@@ -1,0 +1,25 @@
+<ng-container *ngFor="let letterGroup of guessLetters; let i = index">
+  <div>
+    <ng-container *ngFor="let letter of letterGroup">
+      <div class="guess-box" [ngClass]="i === guessNum ? letter.guessData : ''">
+        <div [ngStyle]="letter.style">{{ letter.letter }}</div>
+      </div>
+    </ng-container>
+    <!-- <ng-container *ngIf="i !== 0 && letterGroup.length > 0">
+      <ng-container *ngFor="let letter of letterGroup">
+        <div class="guess-box"> <!-- [ngClass]="letter.guessData"> 
+          <div [ngStyle]="letter.style">{{ letter.letter }}</div>
+        </div>
+      </ng-container>
+    </ng-container> -->
+  </div>
+</ng-container>
+<ng-container *ngIf="!gameOver">
+  <!-- <ng-container *ngFor="let letter of guessLetters[0]">
+    <div class="guess-box">
+      <div [ngStyle]="letter.style">{{ letter.letter }}</div>
+    </div>
+  </ng-container> -->
+  <div class="guess-box button delete-button" (click)="onDelete()" >&larr;</div>
+  <div class="guess-box button submit-button" (click)="onSubmit()" >&check;</div>
+</ng-container>

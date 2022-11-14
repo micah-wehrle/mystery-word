@@ -1,0 +1,6 @@
+
+<div style="margin-bottom: 10vmax">
+  <ng-container *ngFor="let letter of letters">
+    <div [ngStyle]="letter.style" (click)="onGuessLetter(letter)">{{ letter.letter }}</div>
+  </ng-container>
+</div>

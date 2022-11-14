@@ -1,0 +1,56 @@
+<div class="overlay-full" (click)="onClosePopup()"></div>
+<div class="overlay-small">
+  <div class="container">
+    <button type="button" class="btn btn-danger mt-1" (click)="onClosePopup()">&lt; Back</button>
+    <div class="row mt-3">
+      <div class="col-xs-12">
+        <ng-container *ngFor="let letter of infoHeaderLetters">
+          <div [ngStyle]="letter.style">{{ letter.letter }}</div>
+        </ng-container>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="pl-5 pr-5">
+          <h3>How Wordle Works:</h3>
+          <p>Your goal is to guess the 5-letter word using the letters in the provided ransom note. Be warned! You can only use each letter cutout once. If the ransom note contains the letter 'e' 4 times, and you guess 'steam', then you can only use 'e' 3 more times.</p>
+          <h4>Guess Colors:</h4>
+          <p>When you make a guess, the boxes behind the letters will turn one of three colors:</p>
+          <ul>
+            <li>Black: The letter you guessed is not in the word.</li>
+            <li>Yellow: The letter you guessed is in the word, but not in the right place.</li>
+            <li>Green: The letter you guessed is both in the word, and in the right place!</li>
+          </ul>
+          <h3>Todo List:</h3>
+          <p>I know this game might not be very fun, but my main goal is to make a functional final product. Here is what I have left to incorporate:</p>
+          <ul>
+            <li class="strike">Generate a daily word and potentially a daily ransom note.</li>
+            <ul><li>Move daily word and daily ransom note to node server</li></ul>
+            <li>Save past progress, and current-day progress to prevent refreshing to reset the game.</li>
+            <li>Game-over popup.</li>
+            <li>High scores? (Maybe not. One can dream)</li>
+            <li class="strike">Fix yellow letter logic for when duplicate letters are guessed and/or when duplicate letters are present in the secret word.</li>
+            <li>Sound effetcs of people screaming when you guess wrong (just a joke)</li>
+          </ul>
+          <h3>Version History:</h3>
+          <div class="container">
+            <ng-container *ngFor="let version of versionHistory">
+              <div class="d-flex mt-3">
+                <h5>v{{ version.version }}</h5>&nbsp;- ({{ version.date }})
+              </div>
+              <ul>
+                <li *ngFor="let change of version.changes">{{ change }}</li>
+              </ul>
+            </ng-container>
+          </div>
+          <br>
+          <h4>For Kerry:</h4>
+          <br>
+          <button type="button" class="btn btn-success" (click)="onGenerateRansom()">Generate Ransom</button>
+          <p>{{ransomText}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+.paper {
+  background-color: white;
+  padding: 1vmax;
+  padding-bottom: 3vmax;
+  margin-top: 3vmax;
+  border: 2px solid black;
+  box-shadow: 3px 3px 5px 1px black;
+}

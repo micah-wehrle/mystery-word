@@ -1,0 +1,32 @@
+.header {
+  width:100%; 
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.header-image {
+  height:20vmax;
+  z-index: 4000;
+  box-shadow: 0 0 5px 2px black;
+  position: fixed;
+  top: 0;
+  max-height: 260px;
+}
+
+.header-box-top {
+  height: 10vmax;
+  position: relative;
+  top: 0;
+  margin-top:10vmax;
+}
+
+.header-box-bottom {
+  height: 10vmax;
+  position: fixed;
+  top: 10vmax;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}

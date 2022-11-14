@@ -1,0 +1,45 @@
+.guess-box {
+  background-color: lightgray;
+  width: 5vmax;
+  height: 7vmax;
+  display: inline-block;
+  margin-right: 0.7vmax;
+  margin-bottom: 1vmax;
+  border: 0.4vmax solid gray;
+  border-radius: 1vmax;
+  text-align: center;
+  vertical-align: middle;
+  padding-top: 1vmax;
+}
+
+.guess-box-right {
+  background-color: lightgreen;
+  border-color: green;
+}
+
+.guess-box-close {
+  background-color: rgb(255, 255, 132);
+  border-color: rgb(213, 213, 91);
+}
+
+.guess-box-wrong {
+  background-color: rgb(227, 152, 152);
+  border-color: rgb(198, 118, 118);
+}
+
+.button {
+  height: 5vmax;
+  color: black;
+  border:none;
+  font-size: 2vmax;
+  cursor: pointer;
+}
+
+.delete-button {
+  margin-left: 0.7vmax;
+  background-color: rgb(228, 100, 100);
+}
+
+.submit-button {
+  background-color: rgb(0, 148, 0);
+}

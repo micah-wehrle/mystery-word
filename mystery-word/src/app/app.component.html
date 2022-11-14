@@ -1,0 +1,24 @@
+<app-header (openHelpPage)="onHelpPopup()"></app-header>
+<div style="margin-top: 22vmax;" [ngStyle]="{'display': showHelpPopup ? 'none' : ''}">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div style="position:stickys">
+          <app-guesses></app-guesses>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-xs-12">
+            <div class="paper">
+              <app-ransom-letter></app-ransom-letter>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-container *ngIf="showHelpPopup">
+  <app-info-popup (closePopup)="showHelpPopup=false"></app-info-popup>
+</ng-container>
