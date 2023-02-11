@@ -11,6 +11,7 @@ export class HeaderComponent implements OnInit {
   public headerLetters: Letter[] = [];
 
   @Output() openHelpPage = new EventEmitter<void>();
+  @Output() openStats = new EventEmitter<void>();
 
 
   constructor(private letterService: LetterService) { }
@@ -43,6 +44,11 @@ export class HeaderComponent implements OnInit {
   onHowToPlay() {
     window.scrollTo(0,0);
     this.openHelpPage.next();
+  }
+
+  onShowStats() {
+    window.scrollTo(0,0);
+    this.openStats.next();
   }
 
 }

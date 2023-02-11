@@ -13,6 +13,15 @@ export class InfoPopupComponent implements OnInit {
 
   public versionHistory = [
     {
+      version: '0.4',
+      date: 'Nov 16, 2022',
+      changes: [
+        'Adjusted menu button',
+        'Added game over/win screen',
+        'Create local storage for current-day progress and past progress',
+      ]
+    },
+    {
       version: '0.3',
       date: 'Nov 13, 2022',
       changes: [

@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable, Output } from '@angular/core';
+import { EventEmitter, Injectable, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { HttpService } from './http.service';
 
@@ -30,6 +30,7 @@ export class LetterService {
   public guessedData: {[key:string]: string} = {};
   
   public gameOver = false;
+  @Output() gameOverUpdate = new EventEmitter<void>();
   
   private todaySeed;
   public targetWord = 'micah';
@@ -61,17 +62,6 @@ export class LetterService {
     for(let i = 97; i < 97+26; i++) {
       this.guessedData[String.fromCharCode(i)] = 'unknown';
     }
-
-    httpService.checkWord(this.targetWord).subscribe({
-      next: () => { 
-        console.log('Confirmed word of the day to be eligible.\nWord of the day: ' + this.targetWord);
-      },
-      error: (err) => { 
-        console.error('Error confirming word of the day eligibility. Setting word of the day to error (lol)');
-        console.error('Response from dictionary API: ', err);
-        this.targetWord = 'error';
-       }
-    });
   }
 
   public randomRansomString(seed: number): string {
@@ -204,6 +194,7 @@ export class LetterService {
     this.guess = this.generateRansomText('     ', 0, {'cursor': 'default'});
     if(right === 5) {
       this.gameOver = true;
+      this.gameOverUpdate.next();
     }
     else {
       this.guessUpdate.next(this.guess);

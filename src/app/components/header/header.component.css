@@ -30,3 +30,10 @@
 .dropdown-item {
   cursor: pointer;
 }
+
+.info-button {
+  padding: 0;
+  width: 7vmin;
+  height: 7vmin;
+  font-size: 3vmin;
+}

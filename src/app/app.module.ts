@@ -9,6 +9,7 @@ import { RansomLetterComponent } from './components/ransom-letter/ransom-letter.
 import { HeaderComponent } from './components/header/header.component';
 import { GuessesComponent } from './components/guesses/guesses.component';
 import { InfoPopupComponent } from './components/info-popup/info-popup.component';
+import { GameoverPopupComponent } from './components/gameover-popup/gameover-popup.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { InfoPopupComponent } from './components/info-popup/info-popup.component
     RansomLetterComponent,
     HeaderComponent,
     GuessesComponent,
-    InfoPopupComponent
+    InfoPopupComponent,
+    GameoverPopupComponent
   ],
   imports: [
     BrowserModule,
