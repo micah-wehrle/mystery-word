@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { StorageService } from 'src/app/services/storage.service';
 
 @Component({
@@ -7,7 +7,7 @@ import { StorageService } from 'src/app/services/storage.service';
   styleUrls: ['./gameover-popup.component.css']
 })
 export class GameoverPopupComponent implements OnInit {
-
+  @Input() gameOver: boolean = false;
   @Output() closePopup = new EventEmitter<void>();
 
   public guessCountHistory: number[] = [];

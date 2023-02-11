@@ -1,7 +1,11 @@
 <div class="overlay-full" (click)="onClosePopup()"></div>
 <div class="overlay-small">
   <div class="container">
+    <ng-container *ngIf="gameOver">
+      <h1>Game over! (you win? sorry a lot of work to do)</h1>
+    </ng-container>
     <h3>Statistics</h3>
     <h5>Times played: {{ timesPlayed }}</h5>
+    <h5>Sorry this is very much a work in progress, none of this works yet!</h5>
   </div>
 </div>

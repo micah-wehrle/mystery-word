@@ -13,25 +13,32 @@ export class RansomLetterComponent implements OnInit {
   public letters: Letter[] = [];
 
   ngOnInit(): void {
-    this.letters = this.letterService.getRansomText();
-
-    for(let letter of this.letters) {
-      if(letter.letter === ' ') {
-        letter.style = {
-          ...letter.style,
-          'margin-left': '3vmax'
+    this.letterService.ready.subscribe({
+      next: (ready) => {
+        if (ready) {
+          this.letters = this.letterService.getRansomText();
+          
+          for(let letter of this.letters) {
+            if(letter.letter === ' ') {
+              letter.style = {
+                ...letter.style,
+                'margin-left': '3vmax'
+              }
+            }
+          }
+        
+          this.letterService.showLetterUpdate.subscribe({next: (index) => {
+            if(index !== -1) {
+              this.letters[index].style = {
+                ...this.letters[index].style,
+                'visibility': 'visible'
+              }
+            }
+          }});
         }
       }
-    }
+    });
 
-    this.letterService.showLetterUpdate.subscribe({next: (index) => {
-      if(index !== -1) {
-        this.letters[index].style = {
-          ...this.letters[index].style,
-          'visibility': 'visible'
-        }
-      }
-    }});
   }
 
   onGuessLetter(letter: Letter) {

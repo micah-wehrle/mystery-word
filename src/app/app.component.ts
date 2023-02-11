@@ -38,3 +38,39 @@ export class AppComponent implements OnInit, OnDestroy {
     this.showGameOverPopup = true;
   }
 }
+
+
+//TODO
+/*
+
+This project needs major refactoring...
+
+The plan:
+
+  Services:
+    letter maker (will generate letters. that's it)
+    http (has async functions that retrieve data from back end)
+    ransom note (manages the ransom note data. full note, letter metadata, what is still there, etc)
+    guesses (manages the guesses)
+    storage (manages local storage)
+
+  Component structure
+    app
+      header
+        button with popup
+        fancy bg
+        logo (clickable?)
+      body
+        guesses
+          array of guesses
+            hide all but current guess on scroll?
+        ransom note
+          just a bunch of buttons
+      popups
+        (use universal frame!)
+        help
+        game over
+        in-game info?
+        fun (like kerry's ransom)
+
+*/

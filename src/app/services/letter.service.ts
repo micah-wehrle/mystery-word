@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { EventEmitter, Injectable, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { HttpService } from './http.service';
+import { BackendResponse, HttpService } from './http.service';
 
 export interface Letter {
   letter: string,
@@ -20,19 +20,19 @@ export interface RansomOptions {
 export class LetterService {
   
   private ransomLetters: Letter[] = [];
-  private ransomText: string;
-  private guesses: Letter[][] = [];
+  private ransomText: string = '';
   
   private guess: Letter[] = this.generateRansomText('     ', 0, {'cursor': 'default'});
   
   public guessUpdate = new BehaviorSubject<Letter[]>(this.guess);
   public showLetterUpdate = new BehaviorSubject<number>(-1);
+  public ready = new BehaviorSubject<boolean>(false);
   public guessedData: {[key:string]: string} = {};
   
   public gameOver = false;
   @Output() gameOverUpdate = new EventEmitter<void>();
   
-  private todaySeed;
+  private todaySeed: number;
   public targetWord = 'micah';
 
   public readonly unknownStyle = {
@@ -53,15 +53,27 @@ export class LetterService {
   };
 
   constructor(private httpService: HttpService) {
-    // today seed will be number of days after start date here ----------v
+
     this.todaySeed = Math.floor(( (new Date()).getTime() - (new Date('10/03/2022')).getTime() ) / 86400000); // ms in a day
-    this.targetWord = this.getWordOfDay(this.todaySeed).toLowerCase();
-    this.ransomText = this.randomRansomString(this.todaySeed) + '                          here are some extra letters just in case: aaabbbcccdddeeefffggghhhiiijjjkkklllmmmnnnooopppqqqrrrssstttuuuvvvwwwxxxyyyzzz';
-    this.setRansomText(this.ransomText, this.todaySeed);
+    this.initializeDailyData();
+    // today seed will be number of days after start date here ----------v
+    // this.todaySeed = Math.floor(( (new Date()).getTime() - (new Date('10/03/2022')).getTime() ) / 86400000); // ms in a day
+    // this.targetWord = this.getWordOfDay(this.todaySeed).toLowerCase();
+    // this.ransomText = this.randomRansomString(this.todaySeed) + '                          here are some extra letters just in case: aaabbbcccdddeeefffggghhhiiijjjkkklllmmmnnnooopppqqqrrrssstttuuuvvvwwwxxxyyyzzz';
+    // this.setRansomText(this.ransomText, this.todaySeed);
 
     for(let i = 97; i < 97+26; i++) {
       this.guessedData[String.fromCharCode(i)] = 'unknown';
     }
+  }
+
+  private async initializeDailyData() {
+    const response: BackendResponse = await this.httpService.getDailyData();
+    const responseGood = response && response.success;
+    this.targetWord = (responseGood && response.dailyWord ? response.dailyWord : this.getWordOfDay(this.todaySeed)).toLowerCase();
+    this.ransomText = (responseGood && response.ransom ? response.ransom : this.randomRansomString(this.todaySeed)) + '                          here are some extra letters just in case: aaabbbcccdddeeefffggghhhiiijjjkkklllmmmnnnooopppqqqrrrssstttuuuvvvwwwxxxyyyzzz';
+    this.setRansomText(this.ransomText, this.todaySeed);
+    this.ready.next(true);
   }
 
   public randomRansomString(seed: number): string {
@@ -93,7 +105,6 @@ export class LetterService {
         return true;
       }
     }
-
     return false;
   }
 
@@ -139,6 +150,14 @@ export class LetterService {
 
   private upperOrLower(str: string, index: number): string {
     return this.randInt(100, index) > 70 ? str.toUpperCase() : str.toLowerCase();
+  }
+
+  public clearCurrentGuess(): void {
+
+  }
+
+  public validateGuessIsAWord(guess: string): Promise<BackendResponse> {
+    return this.httpService.checkWord(guess.toLowerCase());
   }
 
   public checkGuess(guess: Letter[]): Letter[] {
@@ -199,8 +218,6 @@ export class LetterService {
     else {
       this.guessUpdate.next(this.guess);
     }
-
-    console.log(this.guessedData);
 
     this.updateRansomStyles(this.ransomLetters);
 

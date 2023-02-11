@@ -23,5 +23,5 @@
   <app-info-popup (closePopup)="showHelpPopup=false"></app-info-popup>
 </ng-container>
 <ng-container *ngIf="showGameOverPopup">
-  <app-gameover-popup (closePopup)="showGameOverPopup = false"></app-gameover-popup>
+  <app-gameover-popup (closePopup)="showGameOverPopup = false" [gameOver]="showGameOverPopup"></app-gameover-popup>
 </ng-container>

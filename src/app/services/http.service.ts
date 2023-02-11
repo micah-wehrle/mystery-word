@@ -12,33 +12,26 @@ export class HttpService {
 
   constructor(private http: HttpClient) {}
 
-  public async checkWord(word: string): Promise<boolean> {
-    const response = await this.callBackend(`/valid/${word}`);
-    return response && response.isTestWordValid ? response.isTestWordValid : false;
+  public checkWord(word: string): Promise<BackendResponse> {
+    return this.callBackend(`/validate/${word}`);
   }
 
-  public async getDailyData(): Promise<DailyData> {
-    const response = await this.callBackend('/daily');
-    const output: DailyData = {
-      dailyWord: response && response.dailyWord ? response.dailyWord : '',
-      ransom: response && response.ransom ? response.ransom : '',
-    }
-
-    return output;
+  public async getDailyData(): Promise<BackendResponse> {
+    return this.callBackend('/daily');
   }
 
-  public async getRansom(seed: number): Promise<string> {
-    const response = await this.callBackend(`/ransom/${seed}`);
-    return response && response.ransom ? response.ransom : '';
+  public getRansom(seed: number): Promise<BackendResponse> {
+    return this.callBackend(`/ransom/${seed}`);
   }
 
-  private async callBackend(path: string): Promise<BackendResponse> {
-    return await firstValueFrom(this.http.get<BackendResponse>(`${this.backendUrl}${path}`));
+  private callBackend(path: string): Promise<BackendResponse> {
+    return firstValueFrom(this.http.get<BackendResponse>(`${this.backendUrl}${path}`));
   }
 
 }
 
-interface BackendResponse {
+export interface BackendResponse {
+  success: boolean,
   dailyWord?: string,
   ransom?: string,
   testWord?: string,

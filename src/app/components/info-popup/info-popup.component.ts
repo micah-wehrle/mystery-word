@@ -14,11 +14,13 @@ export class InfoPopupComponent implements OnInit {
   public versionHistory = [
     {
       version: '0.4',
-      date: 'Nov 16, 2022',
+      date: 'Feb 10, 2023',
       changes: [
         'Adjusted menu button',
-        'Added game over/win screen',
-        'Create local storage for current-day progress and past progress',
+        'Began work on game over/win screen',
+        'Began work on local storage for current-day progress and past progress',
+        'Added NestJS back end, hosted on same machine. Moved daily word and ransom generation to back end',
+        'Added guess validation to back end',
       ]
     },
     {
