@@ -22,3 +22,14 @@
 .strike {
   text-decoration: line-through;
 }
+
+.light-bg {
+  background-color: rgb(203, 196, 251);
+  padding-left:15px;
+  padding-top:8px;
+  padding-right: 15px;
+}
+
+.light-color {
+  color: rgb(86, 81, 113);
+}

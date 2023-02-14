@@ -22,31 +22,55 @@
             <li>Yellow: The letter you guessed is in the word, but not in the right place.</li>
             <li>Green: The letter you guessed is both in the word, and in the right place!</li>
           </ul>
-          <h3>Todo List:</h3>
-          <p>I know this game might not be very fun, but my main goal is to make a functional final product. Here is what I have left to incorporate:</p>
-          <ul>
-            <li class="strike">Generate a daily word and potentially a daily ransom note.</li>
-            <ul><li class="strike">Move daily word and daily ransom note to node server (now nest).</li></ul>
-            <li class="strike">Guess validation (no more guessing AEIOU!)</li>
-            <li>Save past progress, and current-day progress to prevent refreshing to reset the game.</li>
-            <li>Fix mobile layout so guess is always visible, and past guesses are visible when scrolled up.</li>
-            <li>Game-over popup.</li>
-            <li>High scores? (Maybe not. One can dream)</li>
-            <li class="strike">Fix yellow letter logic for when duplicate letters are guessed and/or when duplicate letters are present in the secret word.</li>
-            <li>Sound effetcs of people screaming when you guess wrong (just a joke)</li>
-          </ul>
-          <h3>Version History:</h3>
-          <div class="container">
-            <ng-container *ngFor="let version of versionHistory">
-              <div class="d-flex mt-3">
-                <h5>v{{ version.version }}</h5>&nbsp;- ({{ version.date }})
+          <hr>
+          <div class="row light-bg" (click)="showAllHistory = !showAllHistory">
+            <div class="col-9">
+              <h3>Version History:</h3>
+            </div>
+            <div class="col text-end">
+              <h3 class="light-color">{{ showAllHistory ? '&darr;' : '&uarr;' }}</h3>
+            </div>
+          </div>
+          <div class="container" *ngIf="showAllHistory">
+            <ng-container *ngFor="let version of versionHistory; let i = index">
+              <div class="d-flex mt-3 light-bg" (click)="showHistory[i] = !showHistory[i]">
+                <div class="col">
+                  <h5>v{{ version.version }}</h5>
+                </div>
+                <div class="col text-end light-color">
+                  ({{ version.date }})
+                </div>
               </div>
-              <ul>
+              <ul *ngIf="showHistory[i]">
                 <li *ngFor="let change of version.changes">{{ change }}</li>
               </ul>
             </ng-container>
           </div>
-          <br>
+          <hr>
+          <div class="row light-bg" (click)="showTodo = !showTodo">
+            <div class="col">
+              <h3>Todo List:</h3>
+            </div>
+            <div class="col text-end">
+              <h3 class="light-color">{{ showTodo ? '&darr;' : '&uarr;' }}</h3>
+            </div>
+          </div>
+          <ng-container *ngIf="showTodo">
+            <p>I know this game might not be very fun, but my main goal is to make a functional final product. Here is what I have left to incorporate:</p>
+            <ul>
+              <li>Reposition current guess letters to be visible after scrolling down on mobile.</li>
+              <li>Save past progress, and current-day progress to prevent refreshing to reset the game.</li>
+              <li>Fix mobile layout so guess is always visible, and past guesses are visible when scrolled up.</li>
+              <li>Game-over popup.</li>
+              <li>High scores? (Maybe not. One can dream)</li>
+              <li class="strike">Generate a daily word and potentially a daily ransom note.</li>
+              <ul><li class="strike">Move daily word and daily ransom note to node server (now nest).</li></ul>
+              <li class="strike">Guess validation (no more guessing AEIOU!)</li>
+              <li class="strike">Fix yellow letter logic for when duplicate letters are guessed and/or when duplicate letters are present in the secret word.</li>
+              <li>Sound effetcs of people screaming when you guess wrong (just a joke)</li>
+            </ul>
+          </ng-container>
+          <hr>
           <h4>For Kerry:</h4>
           <br>
           <button type="button" class="btn btn-success" (click)="onGenerateRansom()">Generate Ransom</button>

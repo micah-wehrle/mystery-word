@@ -32,7 +32,7 @@ export class LetterService {
   public gameOver = false;
   @Output() gameOverUpdate = new EventEmitter<void>();
   
-  private todaySeed: number;
+  private todaySeed: number = 1;
   public targetWord = 'micah';
 
   public readonly unknownStyle = {
@@ -54,17 +54,17 @@ export class LetterService {
 
   constructor(private httpService: HttpService) {
 
-    this.todaySeed = Math.floor(( (new Date()).getTime() - (new Date('10/03/2022')).getTime() ) / 86400000); // ms in a day
-    this.initializeDailyData();
+    //this.todaySeed = Math.floor(( (new Date()).getTime() - (new Date('10/03/2022')).getTime() ) / 86400000); // ms in a day
+    //this.initializeDailyData();
     // today seed will be number of days after start date here ----------v
     // this.todaySeed = Math.floor(( (new Date()).getTime() - (new Date('10/03/2022')).getTime() ) / 86400000); // ms in a day
     // this.targetWord = this.getWordOfDay(this.todaySeed).toLowerCase();
     // this.ransomText = this.randomRansomString(this.todaySeed) + '                          here are some extra letters just in case: aaabbbcccdddeeefffggghhhiiijjjkkklllmmmnnnooopppqqqrrrssstttuuuvvvwwwxxxyyyzzz';
     // this.setRansomText(this.ransomText, this.todaySeed);
 
-    for(let i = 97; i < 97+26; i++) {
-      this.guessedData[String.fromCharCode(i)] = 'unknown';
-    }
+    //for(let i = 97; i < 97+26; i++) {
+    //  this.guessedData[String.fromCharCode(i)] = 'unknown';
+    //}
   }
 
   private async initializeDailyData() {

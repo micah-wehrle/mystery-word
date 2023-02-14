@@ -1,0 +1,42 @@
+.guess-box {
+  background-color: lightgray;
+  display: inline-block;
+  margin-right: 0.7vmax;
+  margin-bottom: 1vmax;
+  border: 0.4vmax solid gray;
+  border-radius: 1vmax;
+  text-align: center;
+  vertical-align: middle;
+  padding-top: 1vmax;
+}
+
+.guess-box-mobile {
+  width: 5vmax;
+  height: 7vmax;
+
+}
+
+.guess-box-desktop {
+  width: 55px;
+  height: 77px;
+}
+
+.on-top-ish {
+  z-index: 10;
+}
+
+.guess-pane {
+  background-color: rgb(171, 180, 195);
+  padding: 10px;
+  border: 1px solid darkgray;
+  border-radius: 5px;
+}
+
+.floating {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  top: 24vmax;
+  width: 100%;
+  margin-left: -3vw;
+}

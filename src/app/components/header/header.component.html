@@ -21,6 +21,12 @@
       ?
     </button>
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+      <ng-container *ngIf="isDev">
+        <li><a class="dropdown-item">(DEV TOOLS)</a></li>
+        <li><a class="dropdown-item" (click)="devToolsClearStats()">Clear Stats</a></li>
+        <li><hr class="dropdown-divider"></li>
+
+      </ng-container>
       <li><a class="dropdown-item" (click)="onHowToPlay()">How to play</a></li>
       <li><a class="dropdown-item" (click)="onShowStats()">Stats</a></li>
       <li><a class="dropdown-item" href="https://wehrle.dev/portfolio/angular/mystery-word">
@@ -35,7 +41,7 @@
             wehrle.dev
             <svg width="12px" height="12px" viewBox="0 0 24 24"><g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline><path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path></g></svg>
           </a>
-          <span class="dropdown-item disabled float-end" style="display:inline">v0.4</span>
+          <span class="dropdown-item disabled float-end" style="display:inline">v0.5</span>
         </div>
       </li>
     </ul>

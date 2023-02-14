@@ -1,5 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Letter, LetterService } from 'src/app/services/letter.service';
+import { StorageService } from 'src/app/services/storage.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -9,12 +11,15 @@ import { Letter, LetterService } from 'src/app/services/letter.service';
 export class HeaderComponent implements OnInit {
 
   public headerLetters: Letter[] = [];
+  public isDev: boolean;
 
   @Output() openHelpPage = new EventEmitter<void>();
   @Output() openStats = new EventEmitter<void>();
 
 
-  constructor(private letterService: LetterService) { }
+  constructor(private letterService: LetterService, private storageService: StorageService) {
+    this.isDev = !environment.production;
+  }
 
   ngOnInit(): void {
 
@@ -49,6 +54,10 @@ export class HeaderComponent implements OnInit {
   onShowStats() {
     window.scrollTo(0,0);
     this.openStats.next();
+  }
+
+  public devToolsClearStats(): void {
+    this.storageService.clearStorageAndResetApp();
   }
 
 }

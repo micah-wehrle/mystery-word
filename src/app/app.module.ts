@@ -10,6 +10,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { GuessesComponent } from './components/guesses/guesses.component';
 import { InfoPopupComponent } from './components/info-popup/info-popup.component';
 import { GameoverPopupComponent } from './components/gameover-popup/gameover-popup.component';
+import { GuessPaneComponent } from './components/guess-pane/guess-pane.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { GameoverPopupComponent } from './components/gameover-popup/gameover-pop
     HeaderComponent,
     GuessesComponent,
     InfoPopupComponent,
-    GameoverPopupComponent
+    GameoverPopupComponent,
+    GuessPaneComponent
   ],
   imports: [
     BrowserModule,

@@ -10,8 +10,20 @@ export class InfoPopupComponent implements OnInit {
 
   public infoHeaderLetters: Letter[] = this.letterService.generateRansomText('so you need some help, eh?', 5, {'cursor': 'default'}, {randomColors: true});
   public ransomText = '';
+  public showHistory: boolean[];
+  public showTodo: boolean = false;
+  public showAllHistory: boolean = true;
 
   public versionHistory = [
+    {
+      version: '0.5',
+      date: '???',
+      changes: [
+        'Completely rebuilt service system and large portions of component structure',
+        'Adjusted submit/delete buttons, added option to tap letter to delete',
+        'Added local storage. Saves current-day progress, daily streak, and various past win stats. Entirely local, no user data stored on server.'
+      ]
+    },
     {
       version: '0.4',
       date: 'Feb 10, 2023',
@@ -61,7 +73,12 @@ export class InfoPopupComponent implements OnInit {
 
   @Output() closePopup = new EventEmitter<void>();
 
-  constructor(private letterService: LetterService) { }
+  constructor(private letterService: LetterService) {
+    this.showHistory = [true];
+    for (let i = 1; i < this.versionHistory.length; i++) {
+      this.showHistory.push(false);
+    }
+  }
 
   ngOnInit(): void {
     for(let letter of this.infoHeaderLetters) {

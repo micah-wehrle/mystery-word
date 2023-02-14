@@ -29,6 +29,7 @@ export class GuessesComponent implements OnInit {
     this.letterService.guessUpdate.subscribe({
       next: (guess) => {
         guess.forEach((letter) => {
+          // make incoming guesses always start out gray!
           letter.style = {
             ...letter.style,
             'color': 'white',
@@ -69,13 +70,13 @@ export class GuessesComponent implements OnInit {
     this.checkingWord = false;
 
     if (!response || !response.success) {
-      //TODO handle bad response from back end
+      //TODO - handle bad response from back end
       alert('Bad response from back end! Sorry!');
       return;
     }
     
     if (!response.isTestWordValid) {
-      //TODO show word invalid popup
+      //TODO - show word invalid popup
       alert('That isn\'t a real word!');
       return;
     }
