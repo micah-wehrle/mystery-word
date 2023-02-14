@@ -10,7 +10,8 @@ import { environment } from 'src/environments/environment';
 })
 export class HttpService {
   // TODO - set for environment use! 
-  private backendUrl = 'https://words-api.wehrle.dev/words';//`${environment.backendRootURL}/words`;
+  private backendUrl = `${environment.backendRootURL}/words`;
+  //private backendUrl = 'https://words-api.wehrle.dev/words'; // TODO - for test when local server down
 
   constructor(private http: HttpClient) {
     // this.checkBackend();
