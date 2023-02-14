@@ -9,6 +9,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class HttpService {
+  // TODO - set for environment use! 
   private backendUrl = 'https://words-api.wehrle.dev/words';//`${environment.backendRootURL}/words`;
 
   constructor(private http: HttpClient) {

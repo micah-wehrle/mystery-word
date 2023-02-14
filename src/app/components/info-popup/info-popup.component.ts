@@ -17,11 +17,12 @@ export class InfoPopupComponent implements OnInit {
   public versionHistory = [
     {
       version: '0.5',
-      date: '???',
+      date: 'Feb 14, 2023',
       changes: [
         'Completely rebuilt service system and large portions of component structure',
         'Adjusted submit/delete buttons, added option to tap letter to delete',
-        'Added local storage. Saves current-day progress, daily streak, and various past win stats. Entirely local, no user data stored on server.'
+        'Added local storage. Saves current-day progress, daily streak, and various past win stats. Entirely local, no user data stored on server.',
+        'Added stats and post-game screen. Displays data from local storage, showing things like win streak and past performance.'        
       ]
     },
     {
@@ -70,6 +71,21 @@ export class InfoPopupComponent implements OnInit {
     //   ]
     // },
   ];
+
+  public todos: string[] = [
+    'Fix mobile layout so guess is always visible, and past guesses are visible when scrolled up.',
+    'Remove today guess(es) letter style from local storage, generate style dynamically.',
+    'Add easter egg words (like for generating ransom notes).',
+    'Finish all TODOs and remove dev code.',
+    '-Game-over popup.',
+    '-Save past progress, and current-day progress to prevent refreshing to reset the game.',
+    '-Generate a daily word and potentially a daily ransom note.',
+    '-Move daily word and daily ransom note to node server (now nest).',
+    '-Guess validation (no more guessing AEIOU!)',
+    '-Fix yellow letter logic for when duplicate letters are guessed and/or when duplicate letters are present in the secret word.',
+    'High scores? (Maybe not. One can dream)',
+    'Sound effetcs of people screaming when you guess wrong (just a joke)',
+  ]
 
   @Output() closePopup = new EventEmitter<void>();
 

@@ -7,8 +7,9 @@ interface LocalData {
   currentRansomLetterStates: string[],
   finishedToday: boolean,
   finalGuessCounts: number[],
-  playStreak: number,
   winStreak: number,
+  bestWinStreak: number,
+  gamesFinished: number,
 }
 
 @Injectable({
@@ -31,9 +32,10 @@ export class StorageService {
         currentGuesses: [],
         finishedToday: false,
         finalGuessCounts: [0,0,0,0,0,0],
-        playStreak: 1,
         winStreak: 0,
+        bestWinStreak: 0,
         currentRansomLetterStates: [],
+        gamesFinished: 0
       }
       this.writeData();
     }
@@ -42,14 +44,12 @@ export class StorageService {
       const daysSinceLastPlay: number = (now.getTime() - new Date(this.localData.lastPlayed).getTime())/ (1000*60*60*24);
 
       if(daysSinceLastPlay > 0.5) { // user hasn't played today
-        console.log('user hasnt played today');
         const playedYesterday = daysSinceLastPlay < 2; // using 0.5 to prevent floating point error!
         this.localData = { // reset daily data
           ...this.localData,
           lastPlayed: now,
           currentGuesses: [],
           finishedToday: false,
-          playStreak: playedYesterday ? this.localData.playStreak + 1 : 1,
           winStreak: playedYesterday ? this.localData.winStreak : 0,
         }
       }
@@ -72,22 +72,32 @@ export class StorageService {
     return this.localData.finalGuessCounts.slice();
   }
 
-  public getTimesPlayed(): number {
-    let timesPlayed = 0;
+  public getFinishedToday(): boolean {
+    return this.localData.finishedToday;
+  }
 
-    for(let i = 1; i <= 7; i++) {
-      if(this.localData.finalGuessCounts[i]) {
-        timesPlayed += this.localData.finalGuessCounts[i];
-      }
-    }
+  public getWinStreak(): number {
+    return this.localData.winStreak;
+  }
 
-    return timesPlayed;
+  public getGamesFinished(): number {
+    return this.localData.gamesFinished;
+  }
+
+  public getBestWinStreak(): number {
+    return this.localData.bestWinStreak;
   }
 
   public submitGameOverData(playerWon: boolean): void {
     this.localData.finishedToday = true;
+    this.localData.gamesFinished++;
     this.localData.winStreak = playerWon ? this.localData.winStreak+1 : 0;
-    this.localData.finalGuessCounts[this.localData.currentGuesses.length-1]++;
+    if (this.localData.bestWinStreak < this.localData.winStreak) {
+      this.localData.bestWinStreak = this.localData.winStreak;
+    }
+    if(playerWon) {
+      this.localData.finalGuessCounts[this.localData.currentGuesses.length-1]++;
+    }
 
     this.writeData();
   }
@@ -101,5 +111,10 @@ export class StorageService {
   public clearStorageAndResetApp(): void {
     localStorage.removeItem(this.localStorageName);
     location.reload();
+  }
+
+  public devSetHistory(history: number[]) {
+    this.localData.finalGuessCounts = history;
+    this.writeData();
   }
 }

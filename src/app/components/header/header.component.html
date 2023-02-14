@@ -23,7 +23,9 @@
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
       <ng-container *ngIf="isDev">
         <li><a class="dropdown-item">(DEV TOOLS)</a></li>
-        <li><a class="dropdown-item" (click)="devToolsClearStats()">Clear Stats</a></li>
+        <li *ngFor="let devItem of devItems; let i = index">
+          <a class="dropdown-item" (click)="devTools(i)">{{ devItem }}</a>
+        </li>
         <li><hr class="dropdown-divider"></li>
 
       </ng-container>

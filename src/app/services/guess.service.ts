@@ -9,19 +9,33 @@ import { StorageService } from './storage.service';
 })
 export class GuessService {
 
+  // TODO - remove this
+  public devIgnoreWordCheck: boolean = false;
+
+  private showGameOver: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private guessUpdate: BehaviorSubject<Letter[][]> = new BehaviorSubject<Letter[][]>([[]]);
   private updateLetter: BehaviorSubject<LetterUpdate> = new BehaviorSubject<LetterUpdate>({index: -1, visibleInRansomNote: false});
   private appStateUpdate: BehaviorSubject<AppState> = new BehaviorSubject<AppState>({appUsable: false});
 
   private guesses: Letter[][] = [[]];
-  private readonly maxGuesses: number = 6;
   private appUsable: boolean = false;
   private solutionWord: string = '';
   private ransomText: string = '';
   private letterStates: string[] = [];
+  
+  private readonly maxGuesses: number = 6;
+  private readonly timeoutBeforeGameOverScreen: number = 1000;
 
   constructor(private httpService: HttpService, private letterMakerService: LetterMakerService, private storageService: StorageService) {
     this.initialize();
+  }
+
+  public getShowGameOver(): Observable<boolean> {
+    return this.showGameOver.asObservable();
+  }
+
+  public emitShowGameOver(): void {
+    this.showGameOver.next(true);
   }
   
   public getLetterState(char: string): string {
@@ -33,16 +47,21 @@ export class GuessService {
   }
   
   private initialize(): void {
+    this.guesses = this.storageService.getTodaysGuesses();
+    if (this.guesses.length > 0 && this.guesses[0].length === 5 || this.guesses.length === 0) {
+      this.guesses.push([]);
+    }
+
     this.httpService.getDailyData()
       .then((response) => {
         if (response && response.success && response.dailyWord && response.ransom) {
-          console.log(response.dailyWord)
           this.solutionWord = response.dailyWord.toLowerCase();
           this.ransomText = response.ransom;
           this.appStateUpdate.next({
             appUsable: true,
             ransomText: this.ransomText,
             solutionWord: this.solutionWord,
+            updateColors: true,
           });
         }
         else {
@@ -89,6 +108,10 @@ export class GuessService {
       this.appUsable = true;
       this.appStateUpdate.next({ appUsable: this.appUsable });
     }
+  }
+
+  public getSolutionWord(): string {
+    return this.solutionWord;
   }
 
   /**
@@ -138,19 +161,29 @@ export class GuessService {
       this.lockApp();
       if (curGuess.toLowerCase() === this.solutionWord.toLowerCase()) { // game over, you win!
         //TODO - game over, you win, make sure to submit guess here to storage before win condition! 
-        
+        console.log('win');
+        this.updateGuessColors(this.guesses[this.guesses.length-1]);
+        this.storageService.submitGuess(this.guesses[curGuessIndex], this.letterStates);
+        this.appStateUpdate.next({
+          appUsable: false,
+          gameOver: true,
+          updateColors: true,
+        })
+        this.storageService.submitGameOverData(true);
+        setTimeout(() => {
+          this.showGameOver.next(true);
+        }, this.timeoutBeforeGameOverScreen);
       }
       else {
         this.httpService.checkWord(this.getGuessString()).then(
           (response) => {
             //TODO - handle response
             if (response && response.success) {
-              if (response.isTestWordValid) { // valid guess!
+              if (response.isTestWordValid || this.devIgnoreWordCheck) { // valid guess!
                 this.updateGuessColors(this.guesses[this.guesses.length-1]);
                 this.storageService.submitGuess(this.guesses[curGuessIndex], this.letterStates);
 
                 if (this.guesses.length < this.maxGuesses) {
-                  // this.unlockApp();
                   this.appStateUpdate.next({
                     appUsable: true,
                     updateColors: true,
@@ -161,9 +194,10 @@ export class GuessService {
                   // TODO - handle game over lost
                   this.appStateUpdate.next({
                     appUsable: false,
+                    gameOver: true,
                     updateColors: true,
-                  })
-                  
+                  });
+                  this.storageService.submitGameOverData(false);
                 }
               }
               else {
@@ -245,6 +279,11 @@ export class GuessService {
     this.guessUpdate.next(this.guesses);
   }
 
+  public getGuessCount(): number {
+    const guessesLength = this.guesses.length;
+    return this.guesses[guessesLength - 1].length === 0 ? guessesLength-1 : guessesLength;
+  }
+
 }
 
 export interface AppState {
@@ -253,6 +292,7 @@ export interface AppState {
   ransomText?: string,
   appBroken?: boolean,
   updateColors?: boolean,
+  gameOver?: boolean,
 }
 
 export interface LetterUpdate {

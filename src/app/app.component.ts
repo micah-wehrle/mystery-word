@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { GuessService } from './services/guess.service';
 import { LetterService } from './services/letter.service';
 import { StorageService } from './services/storage.service';
 
@@ -11,7 +12,7 @@ import { StorageService } from './services/storage.service';
 export class AppComponent implements OnInit, OnDestroy {
   title = 'mystery-word';
 
-  constructor(private letterService: LetterService, private storageService: StorageService) {}
+  constructor(private letterService: LetterService, private storageService: StorageService, private guessService: GuessService) {}
 
   public showHelpPopup = false;
   public showGameOverPopup = false;
@@ -19,9 +20,9 @@ export class AppComponent implements OnInit, OnDestroy {
   private gameOverSub!: Subscription;
 
   ngOnInit(): void {
-    this.gameOverSub = this.letterService.gameOverUpdate.subscribe({
-      next: () => {
-        this.showGameOverPopup = true;
+    this.gameOverSub = this.guessService.getShowGameOver().subscribe({
+      next: (showGameOver) => {
+        this.showGameOverPopup = showGameOver;
       },
     });
   }
@@ -40,7 +41,7 @@ export class AppComponent implements OnInit, OnDestroy {
 }
 
 
-//TODO -
+//TODO - Todo todos
 /*
 
 This project needs major refactoring...
@@ -73,4 +74,8 @@ The plan:
         [ ] game over
         [ ] in-game info?
         [ ] fun (like kerry's ransom)
+  
+  Last TODOs:
+    [ ] Remove all dev crap
+    [ ] Finish all TODOs (duh)
 */

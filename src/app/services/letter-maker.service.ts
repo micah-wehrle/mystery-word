@@ -59,12 +59,12 @@ export class LetterMakerService {
    * @param {Object} forcedStyle - (optional) Any styling that should be forced into the styling for the generated Letter object. Defaults to none.
    * @returns {Letter} A Letter object
    */
-  public generateLetter(char: string, letterIndex: number, randomStyle: boolean = true, forcedStyle: {[key: string]: string} = {}): Letter {
+  public generateLetter(char: string, letterIndex: number, randomStyle: boolean = true, forcedStyle: {[key: string]: string} = {}, seedOffset: number = 0): Letter {
     const seed = char.charCodeAt(0) * (letterIndex + 1) * 127;
     return {
-      letter: this.letterCase(char, seed),
+      letter: this.letterCase(char, seed + seedOffset),
       letterIndex,
-      style: this.generateLetterStyle(char, seed, randomStyle, forcedStyle),
+      style: this.generateLetterStyle(char, seed + seedOffset, randomStyle, forcedStyle),
     };
   }
 
@@ -75,11 +75,11 @@ export class LetterMakerService {
    * @param {Object} forcedStyle - (optional) Any styling that should be forced into the styling for the generated Letter object. Defaults to none.
    * @returns {Letter[]} An array of Letter objects
    */
-  public generateLetterArray(str: string, randomStyle: boolean = true, forcedStyle: {[key: string]: string} = {}): Letter[] {
+  public generateLetterArray(str: string, randomStyle: boolean = true, forcedStyle: {[key: string]: string} = {}, seedOffset: number = 0): Letter[] {
     let output: Letter[] = [];
     for (let i = 0; i < str.length; i++) {
       output.push(
-        this.generateLetter(str[i], i, randomStyle, forcedStyle)
+        this.generateLetter(str[i], i, randomStyle, forcedStyle, seedOffset)
       );
     }
     return output;
@@ -107,9 +107,10 @@ export class LetterMakerService {
     const angWeight = 8;
     let rotationAng = 0;
     for (let i = 0; i < angWeight; i++) {
-      rotationAng += this.randInt(maxAng*2, seed+10+i)-maxAng;
+      rotationAng += this.randInt(maxAng*2, seed*i+10)-maxAng;
     }
     rotationAng = Math.floor(rotationAng / angWeight);
+    // rotationAng = this.randInt(20, seed+10)-10
 
     let outputStyle: {[key: string]: string} = {
       'font-family': this.randFont(seed+2),

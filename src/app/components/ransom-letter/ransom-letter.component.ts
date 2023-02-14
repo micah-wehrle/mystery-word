@@ -57,10 +57,6 @@ export class RansomLetterComponent implements OnInit {
       next: (appState) => {
         this.appUsable = appState.appUsable;
 
-        if (appState.updateColors) {
-          this.updateLetterStates();
-        }
-
         if (appState.appBroken) {
           //TODO - handle app broken!
         }
@@ -78,14 +74,17 @@ export class RansomLetterComponent implements OnInit {
             this.updateLetterStates();
           }
         }
+
+        if (appState.updateColors) {
+          this.updateLetterStates();
+        }
       }
     })
   }
 
-  onGuessLetter(letter: Letter) {
+  public onGuessLetter(letter: Letter): void {
     if(!this.appUsable || !letter.letter.match(/[a-z]/i) || this.letterService.gameOver) { return; }
     
-    // if(this.letterService.addGuessLetter({...letter})) {
     if (this.guessService.addLetter({...letter})) {
       letter.style = {
         ...letter.style,

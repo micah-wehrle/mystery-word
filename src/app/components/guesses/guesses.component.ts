@@ -21,7 +21,7 @@ export class GuessesComponent implements OnInit {
   constructor(private letterService: LetterService) { }
 
   ngOnInit(): void {
-
+    console.log("USING DEPRECIATED COMPONENT. PLEASE REMOVE GUESSES.COMPONENT");
     for(let i = 0; i < 1; i++) {
       this.guessLetters[i] = [this.emptyLetter, this.emptyLetter, this.emptyLetter, this.emptyLetter, this.emptyLetter];
     }
