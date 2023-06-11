@@ -1,6 +1,8 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { GuessService } from 'src/app/services/guess.service';
 import { Letter, LetterMakerService } from 'src/app/services/letter-maker.service';
+import { PopupService } from 'src/app/services/popup.service';
 import { StorageService } from 'src/app/services/storage.service';
 
 @Component({
@@ -8,7 +10,9 @@ import { StorageService } from 'src/app/services/storage.service';
   templateUrl: './guess-pane.component.html',
   styleUrls: ['./guess-pane.component.css']
 })
-export class GuessPaneComponent implements OnInit {
+export class GuessPaneComponent implements OnInit, OnDestroy {
+  //TODO: Remove dev
+  public devIgnoreWordCheck = this.guessService.devIgnoreWordCheck;
 
   @ViewChild('guessBox')
   public guessBox!: ElementRef;
@@ -20,19 +24,28 @@ export class GuessPaneComponent implements OnInit {
   public defaultStyle: {[key: string]: string} = this.letterMakerService.letterStyles['unknown'];
   public gameOver: boolean = false;
   public showGameOverButton: boolean = true;
-  private solutionWord: string = ''; //TODO - decide if this is needed
 
   public shouldFloat: boolean = false;
-  private unfloatHeight: number = -1;
 
-  constructor(private guessService: GuessService, private storageService: StorageService, private letterMakerService: LetterMakerService) { }
+  private guessAppStateSub!: Subscription;
+  private guessUpdatesSub!: Subscription;
+
+  constructor(private guessService: GuessService, private storageService: StorageService, private letterMakerService: LetterMakerService, private popupService: PopupService) { }
 
   ngOnInit(): void {
     this.subscribeToGuessUpdates();
     this.subscribeToAppState();
-
-    // this.getGuessesFromStorage();
     this.guessBoxClass = `guess-box-${this.guessService.isMobile() ? 'mobile' : 'desktop'}`;
+  }
+
+  ngOnDestroy(): void {
+      if (this.guessAppStateSub) {
+        this.guessAppStateSub.unsubscribe();
+      }
+
+      if (this.guessUpdatesSub) {
+        this.guessUpdatesSub.unsubscribe();
+      }
   }
 
   public submitGuess(): void {
@@ -44,11 +57,11 @@ export class GuessPaneComponent implements OnInit {
   }
 
   public showStatPage(): void {
-    this.guessService.emitShowGameOver();
+    this.popupService.setPopupToShow('gameOver');
   }
 
   public tryToDeleteLetter(nextLetter: Letter): void {
-    if(!nextLetter) {
+    if(!nextLetter && !this.gameOver) {
       this.deleteLetter();
     }
   }
@@ -58,32 +71,28 @@ export class GuessPaneComponent implements OnInit {
   }
 
   private getGuessesFromStorage(): void {
-    const todaysGuesses: Letter[][] = this.storageService.getTodaysGuesses();
+    const todaysGuesses: {letterIndex: number, letter:string}[][] = this.storageService.getTodaysGuesses();
     this.gameOver = this.storageService.getFinishedToday();
     let anyGuesses = false;
+    let i = 0;
     for (let guessArray of todaysGuesses) {
       anyGuesses = true;
-      let i = 0;
       this.guessRows[i] = [];
       for (let letter of guessArray) {
         // hides used letters from ransom note
+        this.guessRows[i].push(this.letterMakerService.generateLetter(letter.letter.toLowerCase(), letter.letterIndex, false));
         this.guessService.emitLetterUpdate(letter.letterIndex, false);
       }
+      this.guessService.updateGuessColors(this.guessRows[i]);
       i++;
     }
 
-    if (todaysGuesses) {
-      this.guessRows = todaysGuesses;
-    }
-
-    /*
-      I think I can make it so I only save letter indexes! might be prudent to save letter char as well idk. 
-      But what can be done is retrieve the letter styling data from the ransom note, and then each row run guessService.updateGuessColors
-    */
-
-    if (this.guessRows.length < 6 && anyGuesses && !this.gameOver || this.guessRows.length === 0) { //TODO - adjust with dynamic guess count!
+    if (this.guessRows.length < this.guessService.maxGuesses && anyGuesses && !this.gameOver || this.guessRows.length === 0) { 
       this.guessRows.push([]);
     }
+
+    this.guessService.setGuesses(this.guessRows);
+
   }
 
   @HostListener('window:scroll')
@@ -98,7 +107,7 @@ export class GuessPaneComponent implements OnInit {
   }
 
   private subscribeToGuessUpdates(): void {
-    this.guessService.getUpdates().subscribe({
+    this.guessUpdatesSub = this.guessService.getUpdates().subscribe({
       next: (guessRows: Letter[][]) => { 
         this.guessRows = guessRows; 
       }
@@ -106,12 +115,15 @@ export class GuessPaneComponent implements OnInit {
   }
 
   private subscribeToAppState(): void {
-    this.guessService.getAppState().subscribe({
+    this.guessAppStateSub = this.guessService.getAppState().subscribe({
       next: (appState) => {
+        //TODO :remove dev
+        this.devIgnoreWordCheck = this.guessService.devIgnoreWordCheck;
+        
         this.appUsable = appState.appUsable;
 
         if (appState.appBroken) {
-          //TODO- handle app broken
+          //TODO- handle app broken?
         }
 
         if (appState.gameOver) {
@@ -120,10 +132,6 @@ export class GuessPaneComponent implements OnInit {
 
         if (appState.ransomText) {
           this.getGuessesFromStorage();
-        }
-
-        if (appState.solutionWord) {
-          this.solutionWord = appState.solutionWord;
         }
       }
     });

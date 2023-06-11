@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { PopupService } from 'src/app/services/popup.service';
 import { GuessService } from 'src/app/services/guess.service';
 import { StorageService } from 'src/app/services/storage.service';
 
@@ -9,7 +10,6 @@ import { StorageService } from 'src/app/services/storage.service';
 })
 export class GameoverPopupComponent implements OnInit {
   public gameOver: boolean = false;
-  @Output() closePopup = new EventEmitter<void>();
 
   public finalGuessCounts: number[] = [];
   public longestPastGuessAmount: number = 0;
@@ -21,7 +21,7 @@ export class GameoverPopupComponent implements OnInit {
 
   private totalWins: number = 0;
 
-  constructor(private storageService: StorageService, private guessService: GuessService) {}
+  constructor(private storageService: StorageService, private guessService: GuessService, private popupService: PopupService) {}
 
   ngOnInit(): void {
     this.scrollToTop();
@@ -80,7 +80,7 @@ export class GameoverPopupComponent implements OnInit {
   }
 
   onClosePopup(): void {
-    this.closePopup.next();
+    this.popupService.setPopupToShow('');
   }
 
 }

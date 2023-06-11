@@ -70,7 +70,7 @@ export class LetterMakerService {
 
   /**
    * @description Generates an array of Letter objects, based on the given inputs. Essentially just calls generateLetter() for each character of the input string
-   * @param {string} str 
+   * @param {string} str The string of characters to convert to an array of ransom letter objects
    * @param {boolean} randomStyle - (optional) If the style coloring should be randomized. Defaults to true.
    * @param {Object} forcedStyle - (optional) Any styling that should be forced into the styling for the generated Letter object. Defaults to none.
    * @returns {Letter[]} An array of Letter objects

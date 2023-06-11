@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
 export class HttpService {
   // TODO - set for environment use! 
   private backendUrl = `${environment.backendRootURL}/words`;
-  //private backendUrl = 'https://words-api.wehrle.dev/words'; // TODO - for test when local server down
+  // private backendUrl = 'https://words-api.wehrle.dev/words'; // TODO - for test when local server down
 
   constructor(private http: HttpClient) {
     // this.checkBackend();
@@ -39,7 +39,12 @@ export class HttpService {
    * @returns {Promise<BackendResponse>}
    */
   public async getDailyData(): Promise<BackendResponse> {
-    return this.callBackend('/daily');
+    // I'm using local date so that it will roll over with the user's local new day (midnight)
+    const startDate = new Date(); 
+    startDate.setFullYear(2018, 3, 27); // Eloise <3
+    const daysSinceStartDate = (new Date().getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24;
+
+    return this.callBackend(`/daily/${daysSinceStartDate}`);
   }
 
   /**

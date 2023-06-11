@@ -3,8 +3,7 @@ import { Letter } from './letter-maker.service';
 
 interface LocalData {
   lastPlayed: Date,
-  currentGuesses: Letter[][],
-  currentRansomLetterStates: string[],
+  currentGuesses: {letterIndex: number, letter: string}[][],
   finishedToday: boolean,
   finalGuessCounts: number[],
   winStreak: number,
@@ -16,6 +15,14 @@ interface LocalData {
   providedIn: 'root'
 })
 export class StorageService {
+
+  /* 
+  TODO: currently there's a bug where you can cheat the win streak. Explanation:
+  Working properly: If you win one day, then don't play at all the next day, then play the third day, you don't lose your streak.
+  Broken: If you win one day, then sign in the next day but DON'T PLAY at all, then the third day you'll still have the same streak as day one.
+  
+  Basically, if you never guess the final time you'll never lose your win streak!
+  */
   
   private readonly localStorageName: string = 'mw-data';
   private localData: LocalData;
@@ -24,9 +31,11 @@ export class StorageService {
     const localDataPull = localStorage.getItem(this.localStorageName);
     let now = new Date()
     now.setHours(0,0,0,0); // just need day
+    // now.setDate(now.getDate() - 1);
+
 
     if(!localDataPull) { // no local storage
-      console.log('no local storage found, initializing');
+      console.log('no local storage found, initializing'); // TODO: remove
       this.localData = { 
         lastPlayed: now,
         currentGuesses: [],
@@ -34,8 +43,8 @@ export class StorageService {
         finalGuessCounts: [0,0,0,0,0,0],
         winStreak: 0,
         bestWinStreak: 0,
-        currentRansomLetterStates: [],
         gamesFinished: 0
+
       }
       this.writeData();
     }
@@ -56,15 +65,11 @@ export class StorageService {
     }
   }
 
-  public getTodaysLetterStates(): string[] {
-    return this.localData.currentRansomLetterStates.slice();
-  }
-
   private writeData(): void {
     localStorage.setItem(this.localStorageName, JSON.stringify(this.localData));
   }
 
-  public getTodaysGuesses(): Letter[][] {
+  public getTodaysGuesses(): {letterIndex: number, letter: string}[][] {
     return this.localData.currentGuesses.slice();
   }
 
@@ -102,9 +107,15 @@ export class StorageService {
     this.writeData();
   }
 
-  public submitGuess(guessLetters: Letter[], allLetterStates: string[]) {
-    this.localData.currentGuesses.push(guessLetters);
-    this.localData.currentRansomLetterStates = allLetterStates;
+  public submitGuess(guessLetters: Letter[]) {
+    const lettersToAdd: {letterIndex: number, letter: string}[] = [];
+    for (let letter of guessLetters) {
+      lettersToAdd.push({
+        letterIndex: letter.letterIndex,
+        letter: letter.letter
+      });
+    }
+    this.localData.currentGuesses.push(lettersToAdd);
     this.writeData();
   }
   
@@ -116,5 +127,12 @@ export class StorageService {
   public devSetHistory(history: number[]) {
     this.localData.finalGuessCounts = history;
     this.writeData();
+  }
+
+  public devBumpBackLastDayPlayed(days: number): void {
+    const today = new Date(this.localData.lastPlayed);
+    this.localData.lastPlayed = new Date(today.getTime() - days*24*60*60*1000);
+    this.writeData();
+    location.reload();
   }
 }

@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { BackendResponse } from 'src/app/services/http.service';
 import { Letter, LetterService } from 'src/app/services/letter.service';
+
+// TODO - Delete this component
 
 @Component({
   selector: 'app-guesses',
@@ -8,7 +11,7 @@ import { Letter, LetterService } from 'src/app/services/letter.service';
   styleUrls: ['./guesses.component.css'],
   changeDetection: ChangeDetectionStrategy.Default,
 })
-export class GuessesComponent implements OnInit {
+export class GuessesComponent implements OnInit, OnDestroy {
 
   guessLetters: Letter[][] = [];
 
@@ -18,6 +21,8 @@ export class GuessesComponent implements OnInit {
   
   private checkingWord: boolean = false;
 
+  private letterGuessSub!: Subscription;
+
   constructor(private letterService: LetterService) { }
 
   ngOnInit(): void {
@@ -26,7 +31,7 @@ export class GuessesComponent implements OnInit {
       this.guessLetters[i] = [this.emptyLetter, this.emptyLetter, this.emptyLetter, this.emptyLetter, this.emptyLetter];
     }
 
-    this.letterService.guessUpdate.subscribe({
+    this.letterGuessSub = this.letterService.guessUpdate.subscribe({
       next: (guess) => {
         guess.forEach((letter) => {
           // make incoming guesses always start out gray!
@@ -41,7 +46,13 @@ export class GuessesComponent implements OnInit {
     });
   }
 
-  onDelete() {
+  ngOnDestroy(): void {
+    if (this.letterGuessSub) {
+      this.letterGuessSub.unsubscribe();
+    }
+  }
+
+  public onDelete(): void {
     if (this.checkingWord) {
       return;
     }
@@ -53,8 +64,7 @@ export class GuessesComponent implements OnInit {
     if (this.checkingWord) {
       return;
     }
-
-    // has to happen after checkingWord validation, but before we make sure there's a 5 letter guess, so we can have sub-5 letter secret guesses
+    
     if (this.checkForSecretWord()) {
       return;
     }
@@ -70,13 +80,11 @@ export class GuessesComponent implements OnInit {
     this.checkingWord = false;
 
     if (!response || !response.success) {
-      //TODO - handle bad response from back end
       alert('Bad response from back end! Sorry!');
       return;
     }
     
     if (!response.isTestWordValid) {
-      //TODO - show word invalid popup
       alert('That isn\'t a real word!');
       return;
     }
@@ -94,17 +102,6 @@ export class GuessesComponent implements OnInit {
     else if(this.guessLetters.length <= 6) {
       this.guessLetters.push([this.emptyLetter, this.emptyLetter, this.emptyLetter, this.emptyLetter, this.emptyLetter])
     }
-    // if(!this.letterService.youWin) {
-    //   if(this.guessLetters.length < 5) {
-    //   }
-    //   else {
-    //     this.gameOver = true;
-    //   }
-    // }
-    // else {
-    //   this.gameOver = true;
-    // }
-  
   }
 
   private guessAsString(): string {
@@ -118,7 +115,6 @@ export class GuessesComponent implements OnInit {
 
     switch (guess) {
       case 'kerry':
-        // this.letterService.clearCurrentGuess();
         return true;
     }
 

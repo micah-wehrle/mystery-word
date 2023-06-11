@@ -1,4 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { PopupService } from 'src/app/services/popup.service';
 import { GuessService } from 'src/app/services/guess.service';
 import { LetterMakerService } from 'src/app/services/letter-maker.service';
 import { Letter, LetterService } from 'src/app/services/letter.service';
@@ -14,33 +15,78 @@ export class HeaderComponent implements OnInit {
 
   public headerLetters: Letter[] = [];
   public isDev: boolean;
+  private seedOff = 27; // 27 my current favorite. I wrote down 1, 5, 13 also?
 
-  // TODO - remove this
-  public devItems: string[] = [
-    "Print Today's Word",
-    'Print Local Storage',
-    'Clear Local Storage',
-    'Add Fake History',
-    'New Header',
-    'Toggle Word Check',
+  // TODO - remove dev stuff
+  public devItems: { text: string, callback: Function }[] = [
+    { text: "~~DEV TOOLS~~", 
+      callback: () => {
+        this.isDev = false;
+        this.guessService.devIgnoreWordCheck = false;
+      }
+    },
+    { text: "Print Today's Word", 
+      callback: () => {
+        console.log(this.guessService.getSolutionWord());
+      }
+    },
+    { text: 'Print Local Storage', 
+      callback: () => {
+        let data = localStorage.getItem('mw-data');
+        data = data ? data : ''
+        console.log(JSON.parse(data));
+      } 
+    },
+    { text: 'Clear Local Storage', 
+      callback: () => {
+        this.storageService.clearStorageAndResetApp();
+      } 
+    },
+    { text: 'Add Fake History', 
+      callback: () => {
+        this.storageService.devSetHistory([0, 2, 7, 15, 9, 22]);
+      } 
+    },
+    { text: 'New Header', 
+      callback: () => {
+        this.headerLetters = this.letterMakerService.generateLetterArray('mystery word', true, {}, ++this.seedOff);
+        console.log('Displaying header with Seed Offset:', this.seedOff);
+      } 
+    },
+    { text: 'Toggle Word Check', 
+      callback: () => {
+        this.guessService.devIgnoreWordCheck = !this.guessService.devIgnoreWordCheck;
+        this.guessService.lockApp();
+        this.guessService.unlockApp();
+        console.log(`Will now ${this.guessService.devIgnoreWordCheck ? 'IGNORE' : 'VALIDATE'} every word submitted.`)
+      } 
+    },
+    { text: '"Skip" to Next Day', 
+      callback: () => {
+        this.storageService.devBumpBackLastDayPlayed(1);
+      } 
+    },
+    { text: '"Skip" Two Days', 
+      callback: () => {
+        this.storageService.devBumpBackLastDayPlayed(2);
+      } 
+    },
   ];
 
-  @Output() openHelpPage = new EventEmitter<void>();
-  @Output() openStats = new EventEmitter<void>();
-
-  private seedOff = 27;
-
-
-  constructor(private letterMakerService: LetterMakerService, private storageService: StorageService, private guessService: GuessService) { //TODO - remove uneccessary service (dev only)
+  constructor(private letterMakerService: LetterMakerService, private storageService: StorageService, private guessService: GuessService, private popupService: PopupService) { //TODO - remove uneccessary service (from dev use!)
     this.isDev = !environment.production;
   }
 
   ngOnInit(): void {
+    this.headerLetters = this.letterMakerService.generateLetterArray('mystery word', true, {}, this.seedOff);
 
-    //TODO - switch to letter maker
-    // this.headerLetters = this.letterService.generateRansomText('mystery word', 3, {}, {randomColors: true}); // Dang just really got used to how this one looks!
-    this.headerLetters = this.letterMakerService.generateLetterArray('mystery word', true, {}, 27); // pretty good: 1,5, 13?
-
+    this.guessService.getAppState().subscribe({
+      next: (appState) => {
+        if (appState.devMode) {
+          this.isDev = true;
+        }
+      }
+    })
     
     for(let letter of this.headerLetters) {
       if(letter.letter === ' ') {
@@ -60,46 +106,23 @@ export class HeaderComponent implements OnInit {
   }
 
 
-
+  // TODO: remove dev stuff?
   onScroll() {
     console.log(window.scrollY);
   }
 
+  onAbout() {
+    window.scrollTo(0,0);
+    this.popupService.setPopupToShow('about');
+  }
+
   onHowToPlay() {
     window.scrollTo(0,0);
-    this.openHelpPage.next();
+    this.popupService.setPopupToShow('info');
   }
-
+  
   onShowStats() {
     window.scrollTo(0,0);
-    this.openStats.next();
+    this.popupService.setPopupToShow('gameOver');
   }
-
-  public devTools(toolNum: number): void {
-    switch(toolNum) {
-      case 2:
-        this.storageService.clearStorageAndResetApp();
-        break;
-      case 0:
-        console.log(this.guessService.getSolutionWord());
-        break;
-      case 1:
-        let data = localStorage.getItem('mw-data');
-        data = data ? data : ''
-        console.log(JSON.parse(data));
-        break;
-      case 3:
-        this.storageService.devSetHistory([0, 2, 7, 15, 9, 22])
-        break;
-      case 4:
-        this.headerLetters = this.letterMakerService.generateLetterArray('mystery word', true, {}, ++this.seedOff);
-        console.log('SeedOffset:', this.seedOff);
-        break;
-      case 5:
-        this.guessService.devIgnoreWordCheck = !this.guessService.devIgnoreWordCheck;
-        console.log(`Will ${this.guessService.devIgnoreWordCheck ? 'IGNORE' : 'VALIDATE'} every word submitted.`)
-        break;
-    }
-  }
-
 }

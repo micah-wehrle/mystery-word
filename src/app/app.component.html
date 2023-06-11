@@ -1,5 +1,5 @@
-<app-header (openHelpPage)="onHelpPopup()" (openStats)="onOpenStats()"></app-header>
-<div style="margin-top: 22vmax;" [ngStyle]="{'display': showHelpPopup ? 'none' : ''}">
+<app-header></app-header>
+<div style="margin-top: 22vmax;">
   <div class="container">
     <div class="row">
       <div class="col-md-6">
@@ -17,10 +17,5 @@
     </div>
   </div>
 </div>
-<ng-container *ngIf="showHelpPopup">
-  <app-info-popup (closePopup)="showHelpPopup=false"></app-info-popup>
-</ng-container>
-<ng-container *ngIf="showGameOverPopup">
-  <app-gameover-popup (closePopup)="showGameOverPopup = false"></app-gameover-popup>
-</ng-container>
+<app-popup-pane *ngIf="currentPopup !== ''"></app-popup-pane>
 <div style="height:300px;"></div>

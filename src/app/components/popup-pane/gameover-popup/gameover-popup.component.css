@@ -1,0 +1,17 @@
+.stat-progress-bar {
+  left: 0;
+  color: white;
+  text-align: end;
+  padding-right: 10px;
+}
+
+.card-bg {
+  background-color: rgb(182, 189, 213);
+}
+
+.small-y-margins {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}

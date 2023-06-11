@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { PopupService } from './services/popup.service';
 import { GuessService } from './services/guess.service';
 import { LetterService } from './services/letter.service';
 import { StorageService } from './services/storage.service';
@@ -12,37 +13,38 @@ import { StorageService } from './services/storage.service';
 export class AppComponent implements OnInit, OnDestroy {
   title = 'mystery-word';
 
-  constructor(private letterService: LetterService, private storageService: StorageService, private guessService: GuessService) {}
+  constructor(private letterService: LetterService, private storageService: StorageService, private guessService: GuessService, private popupService: PopupService) {}
 
-  public showHelpPopup = false;
-  public showGameOverPopup = false;
-
-  private gameOverSub!: Subscription;
+  public currentPopup: string = '';
+  private popupSub!: Subscription;
 
   ngOnInit(): void {
-    this.gameOverSub = this.guessService.getShowGameOver().subscribe({
-      next: (showGameOver) => {
-        this.showGameOverPopup = showGameOver;
-      },
+
+    this.popupSub = this.popupService.getPopupToShow().subscribe({
+      next: (popup: string) => {
+        this.currentPopup = popup;
+      }
     });
   }
 
   ngOnDestroy(): void {
-    this.gameOverSub.unsubscribe();
-  }
 
-  onHelpPopup() {
-    this.showHelpPopup = true;
-  }
-
-  onOpenStats() {
-    this.showGameOverPopup = true;
+    if (this.popupSub) {
+      this.popupSub.unsubscribe();
+    } 
   }
 }
 
 
 //TODO - Todo todos
 /*
+
+[ ] I need to decide how I want the wins and streaks and stuff to be counted. Big questions:
+  What counts as a "day played"?
+    Opening the game at all?
+    Making at least one guess?
+    Playing to completion?
+  Should win streaks be broken if you don't play at all on a day?
 
 This project needs major refactoring...
 
@@ -69,9 +71,9 @@ The plan:
         [ ] ransom note
           [ ] just a bunch of buttons
       [ ] popups
-        [ ] (use universal frame!)
-        [ ] help
-        [ ] game over
+        [x] (use universal frame!)
+        [x] help
+        [x] game over
         [ ] in-game info?
         [ ] fun (like kerry's ransom)
   

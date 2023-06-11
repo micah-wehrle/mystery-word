@@ -18,10 +18,10 @@
     <div class="row mt-3">
       <ng-container *ngIf="!gameOver">
         <div class="col d-grid">
-          <button class="btn btn-danger" (click)="deleteLetter()" [disabled]="guessRows[guessRows.length-1].length === 0">Delete</button>
+          <button class="btn btn-danger" (click)="deleteLetter()" [disabled]="guessRows[guessRows.length-1].length === 0 || !appUsable">Delete</button>
         </div>
         <div class="col d-grid">
-          <button class="btn btn-success" (click)="submitGuess()" [disabled]="guessRows[guessRows.length-1].length < 5">Submit</button>
+          <button class="btn btn-success" (click)="submitGuess()" [disabled]="guessRows[guessRows.length-1].length < 5 || !appUsable">{{ devIgnoreWordCheck ? 'NO CHECK' : 'Submit' }}</button>
         </div>
       </ng-container>
       <ng-container *ngIf="gameOver && showGameOverButton">

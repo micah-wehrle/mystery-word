@@ -2,66 +2,76 @@ import { Injectable, OnInit } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpService } from './http.service';
 import { Letter, LetterMakerService } from './letter-maker.service';
+import { PopupService } from './popup.service';
 import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GuessService {
-
   // TODO - remove this
-  public devIgnoreWordCheck: boolean = false;
-
-  private showGameOver: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private guessUpdate: BehaviorSubject<Letter[][]> = new BehaviorSubject<Letter[][]>([[]]);
-  private updateLetter: BehaviorSubject<LetterUpdate> = new BehaviorSubject<LetterUpdate>({index: -1, visibleInRansomNote: false});
-  private appStateUpdate: BehaviorSubject<AppState> = new BehaviorSubject<AppState>({appUsable: false});
+  public devIgnoreWordCheck: boolean = true;
+  private cheaterCheck: boolean = false;
 
   private guesses: Letter[][] = [[]];
   private appUsable: boolean = false;
   private solutionWord: string = '';
   private ransomText: string = '';
   private letterStates: string[] = [];
+
+  // private showGameOver: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private guessUpdate: BehaviorSubject<Letter[][]> = new BehaviorSubject<Letter[][]>([[]]);
+  private updateLetter: BehaviorSubject<LetterUpdate> = new BehaviorSubject<LetterUpdate>({index: -1, visibleInRansomNote: false});
+  private appStateUpdate: BehaviorSubject<AppState> = new BehaviorSubject<AppState>({appUsable: this.appUsable});
   
-  private readonly maxGuesses: number = 6;
+  public readonly maxGuesses: number = 6;
   private readonly timeoutBeforeGameOverScreen: number = 1000;
 
-  constructor(private httpService: HttpService, private letterMakerService: LetterMakerService, private storageService: StorageService) {
+  constructor(private httpService: HttpService, private letterMakerService: LetterMakerService, private storageService: StorageService, private popupService: PopupService) {
     this.initialize();
   }
 
-  public getShowGameOver(): Observable<boolean> {
-    return this.showGameOver.asObservable();
-  }
-
-  public emitShowGameOver(): void {
-    this.showGameOver.next(true);
-  }
+  // /**
+  //  * @description Allows for a component to subscribe to the showGameOver event, to be notified when the game over popup should be shown. Primarily used for displaying the game over popup.
+  //  * @returns {Observable<boolean>} Returns the showGameOver observable
+  //  */
+  // public getShowGameOver(): Observable<boolean> {
+  //   return this.showGameOver.asObservable();
+  // }
   
+  /**
+   * @description Allows for a component to request the known state about a particular letter. The known state of a letter can be wrong, unknown, close, and right.
+   * @param {string} char The letter to check the state for. More than a single letter can be passed, but only the first character of the string will be checked.
+   * @returns {string} The state of the given letter as a string. Can be 'unknown', 'wrong', 'close', or 'right'.
+   */
   public getLetterState(char: string): string {
     return this.letterStates[char.toLowerCase().charCodeAt(0)-97];
   }
   
+  /**
+   * @description Will inform if the application is in mobile state. This is done by checking the width of the screen.
+   * @returns {boolean} Returns true if the application is in mobile state.
+   */
   public isMobile(): boolean {
     return window.innerWidth < 450;
   }
   
+  /**
+   * @todo //TODO Request daily info for the local current day (as opposed to letting the server decide what "today" is)
+   * @description Initializations for the guess service. Calls the word api to get daily game info, such as ransom text and the solution word.
+   * @returns {void}
+   */
   private initialize(): void {
-    this.guesses = this.storageService.getTodaysGuesses();
-    if (this.guesses.length > 0 && this.guesses[0].length === 5 || this.guesses.length === 0) {
-      this.guesses.push([]);
-    }
-
     this.httpService.getDailyData()
       .then((response) => {
         if (response && response.success && response.dailyWord && response.ransom) {
           this.solutionWord = response.dailyWord.toLowerCase();
           this.ransomText = response.ransom;
+          this.appUsable = true;
           this.appStateUpdate.next({
             appUsable: true,
             ransomText: this.ransomText,
             solutionWord: this.solutionWord,
-            updateColors: true,
           });
         }
         else {
@@ -69,21 +79,15 @@ export class GuessService {
         }
       })
       .catch((error) => {
+        this.appUsable = false;
         this.appStateUpdate.next({
           appUsable: false,
           appBroken: true
         })
       })
     ;
-
-    this.letterStates = this.storageService.getTodaysLetterStates();
-    if (!this.letterStates || !Array.isArray(this.letterStates) || this.letterStates.length !== 26) {
-      for (let i = 0; i < 26; i++) {
-        this.letterStates[i] = 'unknown';
-      }
-    }
   }
-
+  
   public getUpdates(): Observable<Letter[][]> {
     return this.guessUpdate.asObservable();
   }
@@ -94,6 +98,10 @@ export class GuessService {
 
   public getAppState(): Observable<AppState> {
     return this.appStateUpdate.asObservable();
+  }
+
+  public getAppUsable(): boolean {
+    return this.appUsable;
   }
 
   public lockApp(): void {
@@ -158,64 +166,106 @@ export class GuessService {
 
     if (curGuessLength === 5) {
       const curGuess = this.getGuessString();
-      this.lockApp();
-      if (curGuess.toLowerCase() === this.solutionWord.toLowerCase()) { // game over, you win!
-        //TODO - game over, you win, make sure to submit guess here to storage before win condition! 
-        console.log('win');
-        this.updateGuessColors(this.guesses[this.guesses.length-1]);
-        this.storageService.submitGuess(this.guesses[curGuessIndex], this.letterStates);
-        this.appStateUpdate.next({
-          appUsable: false,
-          gameOver: true,
-          updateColors: true,
-        })
-        this.storageService.submitGameOverData(true);
-        setTimeout(() => {
-          this.showGameOver.next(true);
-        }, this.timeoutBeforeGameOverScreen);
-      }
-      else {
-        this.httpService.checkWord(this.getGuessString()).then(
-          (response) => {
-            //TODO - handle response
-            if (response && response.success) {
-              if (response.isTestWordValid || this.devIgnoreWordCheck) { // valid guess!
-                this.updateGuessColors(this.guesses[this.guesses.length-1]);
-                this.storageService.submitGuess(this.guesses[curGuessIndex], this.letterStates);
+      const isEasterEgg = this.processEasterEgg(curGuess);
 
-                if (this.guesses.length < this.maxGuesses) {
-                  this.appStateUpdate.next({
-                    appUsable: true,
-                    updateColors: true,
-                  });
-                  this.guesses.push([]);
+      if (!isEasterEgg) { // otherwise if no easter egg entered:
+        this.lockApp();
+        if (curGuess.toLowerCase() === this.solutionWord.toLowerCase()) { // game over, you win!
+          this.updateGuessColors(this.guesses[this.guesses.length-1]);
+          this.storageService.submitGuess(this.guesses[curGuessIndex]);
+          this.appStateUpdate.next({
+            appUsable: false,
+            gameOver: true,
+            updateColors: true,
+          })
+          this.storageService.submitGameOverData(true);
+          setTimeout(() => {
+            this.popupService.setPopupToShow('gameOver');
+          }, this.timeoutBeforeGameOverScreen);
+        }
+        else {
+          this.httpService.checkWord(this.getGuessString()).then(
+            (response) => {
+              if (response && response.success) {
+                if (response.isTestWordValid || this.devIgnoreWordCheck) { // valid guess!
+                  this.updateGuessColors(this.guesses[this.guesses.length-1]);
+                  this.storageService.submitGuess(this.guesses[curGuessIndex]);
+
+                  if (this.guesses.length < this.maxGuesses) {
+                    this.appUsable = true;
+                    this.appStateUpdate.next({
+                      appUsable: true,
+                      updateColors: true,
+                    });
+                    this.guesses.push([]);
+                  }
+                  else { // game over, you lose!
+                    this.appStateUpdate.next({
+                      appUsable: false,
+                      gameOver: true,
+                      updateColors: true,
+                    });
+                    this.storageService.submitGameOverData(false);
+                  }
                 }
-                else { // game over, you lose!
-                  // TODO - handle game over lost
-                  this.appStateUpdate.next({
-                    appUsable: false,
-                    gameOver: true,
-                    updateColors: true,
-                  });
-                  this.storageService.submitGameOverData(false);
+                else {
+                  // TODO - handle bad word without alert?
+                  this.unlockApp();
+                  alert("That's not a real word!");
                 }
               }
-              else {
-                // TODO - handle bad word without alert
-                this.unlockApp();
-                alert("That's not a real word!");
-              }
+            },
+            (error) => {
+              //TODO - emit error?
             }
-          },
-          (error) => {
-            //TODO - emit error
-          }
-        );
+          );
+        }
       }
     }
-    else {
-      //TODO - reject submission
+  }
+
+  private processEasterEgg(guess: string): boolean {
+    let easterEgg = true;
+    switch(guess) {
+      case 'kerry':
+        this.popupService.setPopupToShow('kerry');
+        break;
+      case 'imdev':
+        this.appStateUpdate.next({
+          appUsable: this.appUsable,
+          devMode: true,
+        });
+        break;
+      case 'chetr':
+        alert("That's cheating! Please confirm if you're SURE you want to cheat...");
+        this.cheaterCheck = true;
+        break;
+      case 'imsur':
+        if (this.cheaterCheck) {
+          alert(`If you insist. \nThe solution is: ${this.solutionWord}`);
+        }
+        break;
+      default:
+        easterEgg = false;
+        break;
     }
+
+    if (guess === 'imsur' && !this.cheaterCheck) {
+      easterEgg = false;
+    }
+
+    if (guess !== 'chetr') {
+      this.cheaterCheck = false;
+    }
+
+
+    if (easterEgg) {
+      for (let i = 1; i <= 5; i++) {
+        this.removeLetter();
+      }
+    }
+
+    return easterEgg;
   }
 
   private getGuessString(): string {
@@ -226,7 +276,7 @@ export class GuessService {
       guess = guess + letter.letter;
     });
 
-    return guess;
+    return guess.toLowerCase();
   }
 
   /**
@@ -273,6 +323,14 @@ export class GuessService {
         }
       }
     }
+
+    // I formerly updated data here, AND ALSO after this method was called. I decided to call it outside of this method because sometimes app usability will change depending on if you win/lose and such
+    // Tell the ransom-letter component to update colors now that they've been calculated
+    // this.appUsable = true;
+    // this.appStateUpdate.next({
+    //   appUsable: this.appUsable,
+    //   updateColors: true,
+    // });
   }
 
   private updateGuesses(): void {
@@ -284,6 +342,10 @@ export class GuessService {
     return this.guesses[guessesLength - 1].length === 0 ? guessesLength-1 : guessesLength;
   }
 
+  public setGuesses(guesses: Letter[][]): void {
+    this.guesses = guesses;
+  }
+
 }
 
 export interface AppState {
@@ -293,6 +355,7 @@ export interface AppState {
   appBroken?: boolean,
   updateColors?: boolean,
   gameOver?: boolean,
+  devMode?: boolean,
 }
 
 export interface LetterUpdate {

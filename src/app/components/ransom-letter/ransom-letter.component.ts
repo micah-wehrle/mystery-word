@@ -1,18 +1,23 @@
-import { ApplicationInitStatus, Component, Input, OnInit } from '@angular/core';
+import { ApplicationInitStatus, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { AppState, GuessService, LetterUpdate } from 'src/app/services/guess.service';
 import { LetterMakerService } from 'src/app/services/letter-maker.service';
 import { Letter, LetterService } from 'src/app/services/letter.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-ransom-letter',
   templateUrl: './ransom-letter.component.html',
   styleUrls: ['./ransom-letter.component.css']
 })
-export class RansomLetterComponent implements OnInit {
+export class RansomLetterComponent implements OnInit, OnDestroy {
 
   public letters: Letter[] = [];
   public appUsable: boolean = false;
   private letterUpdatesToApply: LetterUpdate[] = [];
+
+  private letterRestorationSub!: Subscription;
+  private appStateSub!: Subscription;
   
   constructor(private letterService: LetterService, private letterMakerService: LetterMakerService, private guessService: GuessService) {
     // needs to happen early so that it's listening before the guess-pane begins emitting letter updates gotten from storage
@@ -21,10 +26,50 @@ export class RansomLetterComponent implements OnInit {
   }
   
   ngOnInit(): void {
+    // TODO: remove for v1.0. Sucks because I'm sort of proud of this event handling as I was able to do something which was originally not something I thought I'd need to be able to do lol
+    if (!environment.production) {
+      document.addEventListener('keydown', (event: KeyboardEvent): void => {
+        if (!this.guessService.getAppUsable()) {
+          return;
+        }
+        if (event.key.match(/^[a-z]$/)) {
+          for (let letter of this.letters) {
+            if (letter.letter.toLowerCase() === event.key) {
+              if (letter.style.hasOwnProperty('visibility')) {
+                interface Style {
+                  visibility: string;
+                }
+                if ((letter.style as Style).visibility === 'hidden') {
+                  continue;
+                }
+              }
+              this.onGuessLetter(letter);
+              break;
+            }
+          }
+        }
+        else if (event.key === 'Backspace') {
+          this.guessService.removeLetter();
+        }
+        else if (event.key === 'Enter') {
+          this.guessService.submitGuess();
+        }
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.letterRestorationSub) {
+      this.letterRestorationSub.unsubscribe();
+    }
+
+    if (this.appStateSub) {
+      this.appStateSub.unsubscribe();
+    }
   }
     
   private subscribeToLetterRestoration(): void {
-    this.guessService.getLetterUpdates().subscribe({
+    this.letterRestorationSub = this.guessService.getLetterUpdates().subscribe({
       next: (letterUpdate: LetterUpdate) => {
         if (letterUpdate.index !== -1) {
           if (this.letters.length === 0) {
@@ -53,7 +98,7 @@ export class RansomLetterComponent implements OnInit {
   }
 
   private subscribeToAppState(): void {
-    this.guessService.getAppState().subscribe({
+    this.appStateSub = this.guessService.getAppState().subscribe({
       next: (appState) => {
         this.appUsable = appState.appUsable;
 
@@ -83,7 +128,9 @@ export class RansomLetterComponent implements OnInit {
   }
 
   public onGuessLetter(letter: Letter): void {
-    if(!this.appUsable || !letter.letter.match(/[a-z]/i) || this.letterService.gameOver) { return; }
+    if(!this.appUsable || !letter.letter.match(/[a-z]/i) || this.letterService.gameOver) { 
+      return; 
+    }
     
     if (this.guessService.addLetter({...letter})) {
       letter.style = {

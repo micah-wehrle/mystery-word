@@ -1,0 +1,59 @@
+<div class="container">
+  <div class="row text-end">
+    <div class="col mt-2">
+      <button type="button" class="btn btn-sm btn-secondary mt-1 px-2 py-1" (click)="onClosePopup()">&#10006;</button>
+    </div>
+  </div>
+  <div class="row mt-3 mx-1">
+    <div class="col">
+      <ng-container *ngFor="let letter of infoHeaderLetters">
+        <div [ngStyle]="letter.style">{{ letter.letter }}</div>
+      </ng-container>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="pl-5 pr-5">
+        <div class="row light-bg" (click)="showAllHistory = !showAllHistory">
+          <div class="col-9">
+            <h3>Version History:</h3>
+          </div>
+          <div class="col text-end">
+            <h3 class="light-color">{{ showAllHistory ? '&darr;' : '&uarr;' }}</h3>
+          </div>
+        </div>
+        <div class="container" *ngIf="showAllHistory">
+          <ng-container *ngFor="let version of versionHistory; let i = index">
+            <div class="d-flex mt-3 light-bg" (click)="showHistory[i] = !showHistory[i]">
+              <div class="col">
+                <h5>v{{ version.version }}</h5>
+              </div>
+              <div class="col text-end light-color">
+                ({{ version.date }})
+              </div>
+            </div>
+            <ul *ngIf="showHistory[i]">
+              <li *ngFor="let change of version.changes">{{ change }}</li>
+            </ul>
+          </ng-container>
+        </div>
+        <hr>
+        <div class="row light-bg" (click)="showTodo = !showTodo">
+          <div class="col">
+            <h3>Todo List:</h3>
+          </div>
+          <div class="col text-end">
+            <h3 class="light-color">{{ showTodo ? '&darr;' : '&uarr;' }}</h3>
+          </div>
+        </div>
+        <ng-container *ngIf="showTodo">
+          <p>I know this game might not be very fun, but my main goal is to make a functional final product. Here is what I have left to incorporate:</p>
+          <ul>
+            <li *ngFor="let todo of todos" [ngClass]="todo.charAt(0) === '-' ? 'strike' : ''">{{ todo.charAt(0) === '-' ? todo.substring(1) : todo }}</li>
+          </ul>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

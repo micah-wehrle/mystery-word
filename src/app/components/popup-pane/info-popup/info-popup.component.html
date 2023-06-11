@@ -1,0 +1,30 @@
+<div class="container">
+  <div class="row text-end">
+    <div class="col mt-2">
+      <button type="button" class="btn btn-sm btn-secondary mt-1 px-2 py-1" (click)="onClosePopup()">&#10006;</button>
+    </div>
+  </div>
+  <div class="row mt-3 mx-1">
+    <div class="col">
+      <ng-container *ngFor="let letter of infoHeaderLetters">
+        <div [ngStyle]="letter.style">{{ letter.letter }}</div>
+      </ng-container>
+    </div>
+  </div>
+  <hr>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="pl-5 pr-5">
+        <h3>How Wordle Works:</h3>
+        <p>Your goal is to guess the 5-letter word using the letters in the provided ransom note. Be warned! You can only use each letter cutout once. If the ransom note contains the letter 'e' 4 times, and you guess 'steam', then you can only use 'e' 3 more times.</p>
+        <h4>Guess Colors:</h4>
+        <p>When you make a guess, the boxes behind the letters will turn one of three colors:</p>
+        <ul>
+          <li>Black: The letter you guessed is not in the word.</li>
+          <li>Yellow: The letter you guessed is in the word, but not in the right place.</li>
+          <li>Green: The letter you guessed is both in the word, and in the right place!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

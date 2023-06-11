@@ -1,20 +1,35 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { Letter, LetterService } from 'src/app/services/letter.service';
+import { Component, OnInit } from '@angular/core';
+import { Letter, LetterMakerService } from 'src/app/services/letter-maker.service';
+import { PopupService } from 'src/app/services/popup.service';
 
 @Component({
-  selector: 'app-info-popup',
-  templateUrl: './info-popup.component.html',
-  styleUrls: ['./info-popup.component.css']
+  selector: 'app-about-popup',
+  templateUrl: './about-popup.component.html',
+  styleUrls: ['./about-popup.component.css']
 })
-export class InfoPopupComponent implements OnInit {
+export class AboutPopupComponent implements OnInit {
+  public infoHeaderLetters: Letter[] = this.letterMakerService.generateLetterArray('i made this game :P')
 
-  public infoHeaderLetters: Letter[] = this.letterService.generateRansomText('so you need some help, eh?', 5, {'cursor': 'default'}, {randomColors: true});
-  public ransomText = '';
   public showHistory: boolean[];
   public showTodo: boolean = false;
   public showAllHistory: boolean = true;
 
   public versionHistory = [
+    {
+      version: '0.6',
+      date: 'Jun ??, 2023',
+      changes: [
+        'Reduced size of local storage files, no longer including styling data for guesses made for a given day. They are now generated when a game is loaded mid-session.',
+        'Moved popup content into parent popup with popup management service.',
+        'Created easter egg guesses!',
+        'Updated daily secret word and ransom note to be tied to local time instead of the location of the server.',
+        // incomplete:
+        'Back end now verifies that the generated ransom text is compatible with the word of the day.',
+        // not added, just for my notes:
+        // 'Minor improvements, removing duplicate code and unused components.',
+        // 'Several more dev tools for improving local storage management (try guessing "imdev").',
+      ]
+    },
     {
       version: '0.5',
       date: 'Feb 14, 2023',
@@ -74,22 +89,23 @@ export class InfoPopupComponent implements OnInit {
 
   public todos: string[] = [
     'Fix mobile layout so guess is always visible, and past guesses are visible when scrolled up.',
-    'Remove today guess(es) letter style from local storage, generate style dynamically.',
-    'Add easter egg words (like for generating ransom notes).',
+    "Figure out some sort of login feature, so users don't need to worry about losing local data.",
+    'Use logins to post global stats, such as average guesses, and who got the quickest win.',
+    'Work out some better colors and even styling for various UI aspects',
     'Finish all TODOs and remove dev code.',
+    '-Make client request the daily data by passing a date, so the next word will always roll over at midnight local time.',
+    '-Add easter egg words (like for generating ransom notes).',
+    '-Remove today guess(es) letter style from local storage, generate style dynamically.',
     '-Game-over popup.',
     '-Save past progress, and current-day progress to prevent refreshing to reset the game.',
     '-Generate a daily word and potentially a daily ransom note.',
     '-Move daily word and daily ransom note to node server (now nest).',
     '-Guess validation (no more guessing AEIOU!)',
     '-Fix yellow letter logic for when duplicate letters are guessed and/or when duplicate letters are present in the secret word.',
-    'High scores? (Maybe not. One can dream)',
-    'Sound effetcs of people screaming when you guess wrong (just a joke)',
+    'Sound effects of people screaming when you guess wrong (just a joke)',
   ]
 
-  @Output() closePopup = new EventEmitter<void>();
-
-  constructor(private letterService: LetterService) {
+  constructor(private letterMakerService: LetterMakerService, private popupService: PopupService) {
     this.showHistory = [true];
     for (let i = 1; i < this.versionHistory.length; i++) {
       this.showHistory.push(false);
@@ -105,11 +121,7 @@ export class InfoPopupComponent implements OnInit {
   }
 
   public onClosePopup(): void {
-    this.closePopup.next();
-  }
-
-  public onGenerateRansom():void {
-    this.ransomText = this.letterService.randomRansomString(Math.floor(Math.random()*1000000));
+    this.popupService.setPopupToShow('');
   }
 
 }

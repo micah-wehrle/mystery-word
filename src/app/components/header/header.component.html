@@ -22,17 +22,17 @@
     </button>
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
       <ng-container *ngIf="isDev">
-        <li><a class="dropdown-item">(DEV TOOLS)</a></li>
         <li *ngFor="let devItem of devItems; let i = index">
-          <a class="dropdown-item" (click)="devTools(i)">{{ devItem }}</a>
+          <a class="dropdown-item" (click)="devItem.callback()">{{ devItem.text }}</a>
         </li>
         <li><hr class="dropdown-divider"></li>
 
       </ng-container>
+      <li><a class="dropdown-item" (click)="onAbout()">About</a></li>
       <li><a class="dropdown-item" (click)="onHowToPlay()">How to play</a></li>
-      <li><a class="dropdown-item" (click)="onShowStats()">Stats</a></li>
+      <li><a class="dropdown-item" (click)="onShowStats()">Player stats</a></li>
       <li><a class="dropdown-item" href="https://wehrle.dev/portfolio/angular/mystery-word">
-        About this game
+        How it's made 
         <svg width="12px" height="12px" viewBox="0 0 24 24"><g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline><path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path></g></svg>
       </a></li>
       <!-- <li><a class="dropdown-item">Portfolio</a></li> -->
@@ -43,7 +43,7 @@
             wehrle.dev
             <svg width="12px" height="12px" viewBox="0 0 24 24"><g stroke-width="2.1" stroke="#666" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 13.5 17 19.5 5 19.5 5 7.5 11 7.5"></polyline><path d="M14,4.5 L20,4.5 L20,10.5 M20,4.5 L11,13.5"></path></g></svg>
           </a>
-          <span class="dropdown-item disabled float-end" style="display:inline">v0.5</span>
+          <span class="dropdown-item disabled float-end" style="display:inline">v0.6</span>
         </div>
       </li>
     </ul>

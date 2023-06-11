@@ -1,0 +1,18 @@
+<div class="overlay-full" (click)="onClosePopup()"></div>
+<div class="overlay-small">
+  <ng-container [ngSwitch]="currentPopup">
+    <app-about-popup *ngSwitchCase="'about'"></app-about-popup>
+    <app-gameover-popup *ngSwitchCase="'gameOver'"></app-gameover-popup>
+    <app-info-popup *ngSwitchCase="'info'"></app-info-popup>
+    <ng-container *ngSwitchCase="'kerry'">
+      <div class="card">
+        <div class="card-body">
+          <div class="card-title d-grid">
+            <button class="btn btn-success" (click)="onGenerateRansom()">Generate Ransom Note</button>
+          </div>
+          <p class="card-text">{{ ransomText }}</p>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
