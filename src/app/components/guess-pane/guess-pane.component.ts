@@ -13,7 +13,6 @@ import { StorageService } from 'src/app/services/storage.service';
 export class GuessPaneComponent implements OnInit, OnDestroy {
   //TODO: Remove dev
   public devIgnoreWordCheck = this.guessService.devIgnoreWordCheck;
-
   @ViewChild('guessBox')
   public guessBox!: ElementRef;
 
@@ -97,12 +96,11 @@ export class GuessPaneComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll')
   public onScroll(): void {
-    if (!this.shouldFloat) {
+    if (this.guessService.isMobile()) {
       const children: HTMLCollection = this.guessBox.nativeElement.children;
       const lastChild: Element = children[children.length-1];
-
-      // this.shouldFloat = lastChild.getBoundingClientRect().y < 160;
-      
+      this.shouldFloat = document.documentElement.scrollTop > 1 + (this.guessRows.length-1)*50
+      // this.shouldFloat = lastChild.getBoundingClientRect().y < 230;
     }
   }
 

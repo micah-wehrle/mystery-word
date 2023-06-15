@@ -8,3 +8,7 @@
 .light-color {
   color: rgb(86, 81, 113);
 }
+
+.strike {
+  text-decoration: line-through;
+}

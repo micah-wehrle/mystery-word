@@ -23,9 +23,10 @@ export class AboutPopupComponent implements OnInit {
         'Moved popup content into parent popup with popup management service.',
         'Created easter egg guesses!',
         'Updated daily secret word and ransom note to be tied to local time instead of the location of the server.',
-        // incomplete:
         'Back end now verifies that the generated ransom text is compatible with the word of the day.',
-        // not added, just for my notes:
+        'Current guess line is now always visible when the user scrolls down.',
+        // incomplete:
+        // not printed, just for my notes:
         // 'Minor improvements, removing duplicate code and unused components.',
         // 'Several more dev tools for improving local storage management (try guessing "imdev").',
       ]
@@ -88,11 +89,11 @@ export class AboutPopupComponent implements OnInit {
   ];
 
   public todos: string[] = [
-    'Fix mobile layout so guess is always visible, and past guesses are visible when scrolled up.',
     "Figure out some sort of login feature, so users don't need to worry about losing local data.",
     'Use logins to post global stats, such as average guesses, and who got the quickest win.',
     'Work out some better colors and even styling for various UI aspects',
     'Finish all TODOs and remove dev code.',
+    '-Fix mobile layout so guess is always visible, and past guesses are visible when scrolled up.',
     '-Make client request the daily data by passing a date, so the next word will always roll over at midnight local time.',
     '-Add easter egg words (like for generating ransom notes).',
     '-Remove today guess(es) letter style from local storage, generate style dynamically.',

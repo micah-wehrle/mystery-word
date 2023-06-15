@@ -10,7 +10,7 @@ import { StorageService } from './storage.service';
 })
 export class GuessService {
   // TODO - remove this
-  public devIgnoreWordCheck: boolean = true;
+  public devIgnoreWordCheck: boolean = false;
   private cheaterCheck: boolean = false;
 
   private guesses: Letter[][] = [[]];

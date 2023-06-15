@@ -1,9 +1,49 @@
-<div class="text-center on-top-ish" [class]="shouldFloat ? 'floating' : ''">
+<!-- I achieved the floating effect by essentially duplicating the guess box area. The main one is always present, but is set to visibility:hidden when the user scrolls down far enough to see the floating one -->
+<div class="text-center on-top-ish" [ngStyle]="{'visibility': shouldFloat ? 'hidden' : ''}">
   <div class="d-inline-block guess-pane">
     <div class="row">
       <div class="col" #guessBox>
+        <ng-container *ngIf="shouldFloat">
+        </ng-container>
         <ng-container *ngFor="let guessRow of guessRows; let i = index">
-          <div class="d-flex" *ngIf="!shouldFloat || (shouldFloat && i === guessRows.length-1)">
+          <div class="d-flex" >
+            <ng-container *ngFor="let j of dummyGuessArrayOf5">
+              <div class="guess-box" [ngClass]="guessBoxClass">
+                <ng-container *ngIf="guessRow[j]">
+                  <div [ngStyle]=" !(!guessRows[i+1] && i < 5) || gameOver ? guessRow[j].style : getDefaultStyle(guessRow[j].style)" (click)="tryToDeleteLetter(guessRow[j+1])">{{ guessRow[j].letter }}</div>
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <ng-container *ngIf="!gameOver">
+        <div class="col d-grid">
+          <button class="btn btn-danger" (click)="deleteLetter()" [disabled]="guessRows[guessRows.length-1].length === 0 || !appUsable">Delete</button>
+        </div>
+        <div class="col d-grid">
+          <button class="btn btn-success" (click)="submitGuess()" [disabled]="guessRows[guessRows.length-1].length < 5 || !appUsable">{{ devIgnoreWordCheck ? 'NO CHECK' : 'Submit' }}</button>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="gameOver && showGameOverButton">
+        <div class="col d-grid">
+          <button class="btn btn-success" (click)="showStatPage()">Game Over - View Stats</button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<div class="text-center on-top-ish floating" *ngIf="shouldFloat">
+  <div class="d-inline-block guess-pane">
+    <div class="row">
+      <div class="col" #guessBox>
+        Current Guess:
+        <ng-container *ngIf="shouldFloat">
+        </ng-container>
+        <ng-container *ngFor="let guessRow of guessRows; let i = index">
+          <div class="d-flex" *ngIf="i === guessRows.length-1">
             <ng-container *ngFor="let j of dummyGuessArrayOf5">
               <div class="guess-box" [ngClass]="guessBoxClass">
                 <ng-container *ngIf="guessRow[j]">
