@@ -17,7 +17,7 @@ export class AboutPopupComponent implements OnInit {
   public versionHistory = [
     {
       version: '0.6',
-      date: 'Jun ??, 2023',
+      date: 'Jun 14, 2023',
       changes: [
         'Reduced size of local storage files, no longer including styling data for guesses made for a given day. They are now generated when a game is loaded mid-session.',
         'Moved popup content into parent popup with popup management service.',
