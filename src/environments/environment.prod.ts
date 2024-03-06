@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  backendRootURL: 'https://words-api.wehrle.dev'
+  backendRootURL: 'https://api.wehrle.dev'
 };

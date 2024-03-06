@@ -9,7 +9,6 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class HttpService {
-  // TODO - set for environment use! 
   private backendUrl = `${environment.backendRootURL}/words`;
   // private backendUrl = 'https://words-api.wehrle.dev/words'; // TODO - for test when local server down
 
@@ -61,11 +60,22 @@ export class HttpService {
    * @param {string} path The path parameters to be appended to the backendUrl. Should begin with /
    * @returns {Promise<BackendResponse>}
    */
-  private callBackend(path: string): Promise<BackendResponse> {
+  private async callBackend(path: string): Promise<BackendResponse> {
     if (path.length === 0 || path[0] !== '/') {
       path = `/${path}`;
     }
-    return firstValueFrom(this.http.get<BackendResponse>(`${this.backendUrl}${path}`));
+
+    let response;
+    
+    try {
+      response = await firstValueFrom(this.http.get<BackendResponse>(`${this.backendUrl}${path}`));
+      return response
+    }
+    catch(e: any) {
+      console.log(e.message);
+    }
+
+    return Promise.resolve({} as BackendResponse);
   }
 
   // private async checkBackend(): Promise<void> {
