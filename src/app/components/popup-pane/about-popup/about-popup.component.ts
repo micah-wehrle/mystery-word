@@ -16,7 +16,7 @@ export class AboutPopupComponent implements OnInit {
 
   public versionHistory = [
     {
-      version: '0.6',
+      version: '0.61',
       date: 'Jun 14, 2023',
       changes: [
         'Reduced size of local storage files, no longer including styling data for guesses made for a given day. They are now generated when a game is loaded mid-session.',
@@ -25,6 +25,7 @@ export class AboutPopupComponent implements OnInit {
         'Updated daily secret word and ransom note to be tied to local time instead of the location of the server.',
         'Back end now verifies that the generated ransom text is compatible with the word of the day.',
         'Current guess line is now always visible when the user scrolls down.',
+        'Fixed bug with daylight saving time causing today to be a fraction.'
         // incomplete:
         // not printed, just for my notes:
         // 'Minor improvements, removing duplicate code and unused components.',
