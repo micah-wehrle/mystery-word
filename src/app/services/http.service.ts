@@ -42,7 +42,7 @@ export class HttpService {
     // I'm using local date so that it will roll over with the user's local new day (midnight)
     const startDate = new Date(); 
     startDate.setFullYear(2018, 3, 27); // Eloise <3
-    const daysSinceStartDate = (new Date().getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24;
+    const daysSinceStartDate = Math.round((new Date().getTime() - startDate.getTime()) / 1000 / 60 / 60 / 24); // Had to round--daylight savings time broke it!!
 
     return this.callBackend(`/daily/${daysSinceStartDate}`);
   }

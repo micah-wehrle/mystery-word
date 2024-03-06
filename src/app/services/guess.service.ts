@@ -331,6 +331,7 @@ export class GuessService {
     //   appUsable: this.appUsable,
     //   updateColors: true,
     // });
+    // WHOOPS just realized this caused a refreshed app with already made guesses to not accurately update colors (until after you make a new guess!)
   }
 
   private updateGuesses(): void {
@@ -344,8 +345,11 @@ export class GuessService {
 
   public setGuesses(guesses: Letter[][]): void {
     this.guesses = guesses;
+    this.appStateUpdate.next({
+      appUsable: this.appUsable, 
+      updateColors: true
+    });
   }
-
 }
 
 export interface AppState {
@@ -362,3 +366,4 @@ export interface LetterUpdate {
   index: number,
   visibleInRansomNote: boolean,
 }
+
